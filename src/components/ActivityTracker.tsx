@@ -199,15 +199,21 @@ const ActivityTracker = () => {
 
   const createClockTickers = () => {
     const tickers = [];
-    for (let hour = 0; hour < 24; hour++) {
-      const angle = (hour / 24) * 360 - 90; // -90 to start from 12 o'clock
+    const clockPositions = [
+      { hour: 12, label: '12' },
+      { hour: 3, label: '3' },
+      { hour: 6, label: '6' },
+      { hour: 9, label: '9' }
+    ];
+
+    clockPositions.forEach(({ hour, label }) => {
+      const angle = (hour / 12) * 360 - 90; // -90 to start from 12 o'clock, /12 for 12-hour format
       const angleRad = (angle * Math.PI) / 180;
       const centerX = 200;
       const centerY = 200;
       
-      const isMainHour = hour % 6 === 0;
       const outerRadius = 180;
-      const innerRadius = isMainHour ? 165 : 170;
+      const innerRadius = 165;
       
       const x1 = centerX + innerRadius * Math.cos(angleRad);
       const y1 = centerY + innerRadius * Math.sin(angleRad);
@@ -222,29 +228,28 @@ const ActivityTracker = () => {
           x2={x2}
           y2={y2}
           stroke="#64748b"
-          strokeWidth={isMainHour ? "3" : "1"}
+          strokeWidth="3"
         />
       );
 
-      if (isMainHour) {
-        const textRadius = 195;
-        const textX = centerX + textRadius * Math.cos(angleRad);
-        const textY = centerY + textRadius * Math.sin(angleRad);
-        
-        tickers.push(
-          <text
-            key={`text-${hour}`}
-            x={textX}
-            y={textY}
-            textAnchor="middle"
-            dominantBaseline="central"
-            className="text-sm font-semibold fill-slate-600"
-          >
-            {hour === 0 ? '12AM' : hour === 12 ? '12PM' : hour < 12 ? `${hour}AM` : `${hour-12}PM`}
-          </text>
-        );
-      }
-    }
+      const textRadius = 195;
+      const textX = centerX + textRadius * Math.cos(angleRad);
+      const textY = centerY + textRadius * Math.sin(angleRad);
+      
+      tickers.push(
+        <text
+          key={`text-${hour}`}
+          x={textX}
+          y={textY}
+          textAnchor="middle"
+          dominantBaseline="central"
+          className="text-sm font-semibold fill-slate-600"
+        >
+          {label}
+        </text>
+      );
+    });
+
     return tickers;
   };
 
