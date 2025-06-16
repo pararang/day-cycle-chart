@@ -49,8 +49,11 @@ const ActivityTracker = () => {
         ? endMinutes - startMinutes 
         : (24 * 60) - startMinutes + endMinutes;
 
-      // Determine if activity is primarily daytime (6am-6pm = 360-1080 minutes)
-      const isDaytime = startMinutes >= 360 && startMinutes < 1080;
+      // Determine if activity is primarily daytime based on clock position
+      // 6am = 90°, 6pm = 270° (bottom half of clock is daytime)
+      // Convert to 12-hour clock: 6am-6pm should be inner ring
+      const startHour = Math.floor(startMinutes / 60);
+      const isDaytime = startHour >= 6 && startHour < 18; // 6am to 6pm
 
       return {
         name: activity.activity,
@@ -155,8 +158,11 @@ const ActivityTracker = () => {
 
   const createPieSlice = (activity: ProcessedActivity, index: number, isInnerRing: boolean) => {
     const totalMinutes = 24 * 60;
-    const startAngle = (activity.startMinutes / totalMinutes) * 360 - 90; // -90 to start from 12 o'clock
-    const endAngle = ((activity.startMinutes + activity.duration) / totalMinutes) * 360 - 90;
+    // Map 24-hour time to clock positions: 6am starts at top (0°), 6pm at bottom (180°)
+    // Subtract 360 minutes (6 hours) to make 6am the starting point (top of clock)
+    const adjustedStartMinutes = (activity.startMinutes - 360 + totalMinutes) % totalMinutes;
+    const startAngle = (adjustedStartMinutes / totalMinutes) * 360;
+    const endAngle = startAngle + (activity.duration / totalMinutes) * 360;
     
     const centerX = 200;
     const centerY = 200;
@@ -200,14 +206,15 @@ const ActivityTracker = () => {
   const createClockTickers = () => {
     const tickers = [];
     const clockPositions = [
-      { hour: 12, label: '12' },
-      { hour: 3, label: '3' },
-      { hour: 6, label: '6' },
-      { hour: 9, label: '9' }
+      { hour: 6, label: '6AM' },  // Top (6am)
+      { hour: 12, label: '12PM' }, // Right (12pm/noon)
+      { hour: 18, label: '6PM' },  // Bottom (6pm)
+      { hour: 0, label: '12AM' }   // Left (12am/midnight)
     ];
 
     clockPositions.forEach(({ hour, label }) => {
-      const angle = (hour / 12) * 360 - 90; // -90 to start from 12 o'clock, /12 for 12-hour format
+      // Map to clock position: 6am at top (0°), rotating clockwise
+      const angle = ((hour - 6) / 24) * 360;
       const angleRad = (angle * Math.PI) / 180;
       const centerX = 200;
       const centerY = 200;
