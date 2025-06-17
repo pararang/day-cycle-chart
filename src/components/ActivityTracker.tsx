@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Upload, Download, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -175,6 +174,7 @@ const ActivityTracker = () => {
     if (isInnerRing) {
       // Inner ring: 6AM to 6PM (12 hours)
       if (activity.isDaytime) {
+        // Convert 24-hour format to 12-hour format starting from 6AM
         startMinutes = activity.startMinutes - 360; // Subtract 6 hours (360 minutes) to start from 0
         duration = activity.duration;
       } else {
@@ -183,12 +183,13 @@ const ActivityTracker = () => {
     } else {
       // Outer ring: 6PM to 6AM (12 hours)
       if (!activity.isDaytime) {
-        // For nighttime activities, normalize to 12-hour cycle starting from 6PM
+        // Convert 24-hour format to 12-hour format for nighttime
         if (activity.startMinutes >= 18 * 60) {
-          startMinutes = activity.startMinutes - 18 * 60; // Start from 6PM as 0
+          // Evening activities (6PM to midnight): 18:00 becomes 0, 20:30 becomes 150 minutes (2.5 hours)
+          startMinutes = activity.startMinutes - 18 * 60;
         } else {
-          // Activities that cross midnight (like sleep from 20:30 to 06:00)
-          startMinutes = activity.startMinutes + 6 * 60; // Add 6 hours for early morning activities
+          // Early morning activities (midnight to 6AM): 06:00 becomes 12*60 (12 hours), 02:00 becomes 8*60
+          startMinutes = activity.startMinutes + 6 * 60;
         }
         duration = activity.duration;
       } else {
