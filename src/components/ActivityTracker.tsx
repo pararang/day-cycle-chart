@@ -87,9 +87,9 @@ const ActivityTracker = () => {
           parsedData = lines.slice(1).map(line => {
             const values = line.split(',').map(v => v.trim());
             return {
-              activity: values[0],
-              start: values[1],
-              end: values[2]
+              start: values[0],
+              end: values[1],
+              activity: values[2] // Activity name is now in the last column
             };
           });
         } else {
@@ -100,9 +100,9 @@ const ActivityTracker = () => {
           const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
           
           parsedData = jsonData.map(row => ({
-            activity: row.activity || row.Activity,
             start: row.start || row.Start,
-            end: row.end || row.End
+            end: row.end || row.End,
+            activity: row.activity || row.Activity
           }));
         }
 
@@ -304,10 +304,10 @@ const ActivityTracker = () => {
               <div className="text-sm text-slate-600">
                 <p className="font-medium mb-2">Expected format:</p>
                 <div className="bg-slate-50 p-3 rounded text-xs font-mono">
-                  activity, start, end<br/>
-                  Gym, 06.00, 07.00<br/>
-                  Work, 07.30, 17.00<br/>
-                  Sleep, 22.00, 06.00
+                  start, end, activity<br/>
+                  06.00, 07.00, Gym<br/>
+                  07.30, 17.00, Work<br/>
+                  22.00, 06.00, Sleep
                 </div>
               </div>
 
