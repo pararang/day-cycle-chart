@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Upload, Download, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -169,11 +170,35 @@ const ActivityTracker = () => {
   };
 
   const createPieSlice = (activity: ProcessedActivity, index: number, isInnerRing: boolean) => {
-    const totalMinutes = 24 * 60;
-    // Start from 12 o'clock (top) and rotate clockwise
-    const adjustedStartMinutes = (activity.startMinutes - 360 + totalMinutes) % totalMinutes;
-    const startAngle = (adjustedStartMinutes / totalMinutes) * 360;
-    const endAngle = startAngle + (activity.duration / totalMinutes) * 360;
+    let startMinutes, duration;
+    
+    if (isInnerRing) {
+      // Inner ring: 6AM to 6PM (12 hours)
+      if (activity.isDaytime) {
+        startMinutes = activity.startMinutes - 360; // Subtract 6 hours (360 minutes) to start from 0
+        duration = activity.duration;
+      } else {
+        return null; // Don't render nighttime activities in inner ring
+      }
+    } else {
+      // Outer ring: 6PM to 6AM (12 hours)
+      if (!activity.isDaytime) {
+        // For nighttime activities, normalize to 12-hour cycle starting from 6PM
+        if (activity.startMinutes >= 18 * 60) {
+          startMinutes = activity.startMinutes - 18 * 60; // Start from 6PM as 0
+        } else {
+          // Activities that cross midnight (like sleep from 20:30 to 06:00)
+          startMinutes = activity.startMinutes + 6 * 60; // Add 6 hours for early morning activities
+        }
+        duration = activity.duration;
+      } else {
+        return null; // Don't render daytime activities in outer ring
+      }
+    }
+    
+    const totalMinutes = 12 * 60; // 12 hours for each ring
+    const startAngle = (startMinutes / totalMinutes) * 360;
+    const endAngle = startAngle + (duration / totalMinutes) * 360;
     
     const centerX = 250;
     const centerY = 250;
@@ -210,10 +235,10 @@ const ActivityTracker = () => {
     const textY = centerY + textRadius * Math.sin(midAngleRad);
 
     // Only show text if the slice is large enough
-    const showText = activity.duration > 60; // Show text for activities longer than 1 hour
+    const showText = duration > 60; // Show text for activities longer than 1 hour
 
     return (
-      <g key={`${activity.name}-${index}`}>
+      <g key={`${activity.name}-${index}-${isInnerRing ? 'inner' : 'outer'}`}>
         <path
           d={pathData}
           fill={activity.color}
@@ -338,12 +363,12 @@ const ActivityTracker = () => {
                     {/* Clock numbers */}
                     {createClockNumbers()}
                     
-                    {/* Inner ring (6am-6pm) */}
+                    {/* Inner ring (6am-6pm) - Daytime activities */}
                     {daytimeActivities.map((activity, index) => 
                       createPieSlice(activity, index, true)
                     )}
                     
-                    {/* Outer ring (6pm-6am) */}
+                    {/* Outer ring (6pm-6am) - Nighttime activities */}
                     {nighttimeActivities.map((activity, index) => 
                       createPieSlice(activity, index, false)
                     )}
