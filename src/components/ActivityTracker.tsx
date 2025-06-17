@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Upload, Download, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -35,8 +34,8 @@ const ActivityTracker = () => {
   ];
 
   const timeToMinutes = (timeStr: string): number => {
-    const [hours, minutes] = timeStr.split('.').map(Number);
-    return hours * 60 + (minutes || 0);
+    const [hours, minutes] = timeStr.split(/[:.]/);
+    return parseInt(hours) * 60 + (parseInt(minutes) || 0);
   };
 
   const processActivities = (rawActivities: Activity[]): ProcessedActivity[] => {
@@ -49,11 +48,8 @@ const ActivityTracker = () => {
         ? endMinutes - startMinutes 
         : (24 * 60) - startMinutes + endMinutes;
 
-      // Determine if activity is primarily daytime based on clock position
-      // 6am = 90°, 6pm = 270° (bottom half of clock is daytime)
-      // Convert to 12-hour clock: 6am-6pm should be inner ring
       const startHour = Math.floor(startMinutes / 60);
-      const isDaytime = startHour >= 6 && startHour < 18; // 6am to 6pm
+      const isDaytime = startHour >= 6 && startHour < 18;
 
       return {
         name: activity.activity,
@@ -158,19 +154,18 @@ const ActivityTracker = () => {
 
   const createPieSlice = (activity: ProcessedActivity, index: number, isInnerRing: boolean) => {
     const totalMinutes = 24 * 60;
-    // Map 24-hour time to clock positions: 6am starts at top (0°), 6pm at bottom (180°)
-    // Subtract 360 minutes (6 hours) to make 6am the starting point (top of clock)
+    // Start from 12 o'clock (top) and rotate clockwise
     const adjustedStartMinutes = (activity.startMinutes - 360 + totalMinutes) % totalMinutes;
     const startAngle = (adjustedStartMinutes / totalMinutes) * 360;
     const endAngle = startAngle + (activity.duration / totalMinutes) * 360;
     
-    const centerX = 200;
-    const centerY = 200;
-    const outerRadius = isInnerRing ? 120 : 160;
-    const innerRadius = isInnerRing ? 60 : 120;
+    const centerX = 250;
+    const centerY = 250;
+    const outerRadius = isInnerRing ? 150 : 200;
+    const innerRadius = isInnerRing ? 80 : 150;
 
-    const startAngleRad = (startAngle * Math.PI) / 180;
-    const endAngleRad = (endAngle * Math.PI) / 180;
+    const startAngleRad = ((startAngle - 90) * Math.PI) / 180; // -90 to start from top
+    const endAngleRad = ((endAngle - 90) * Math.PI) / 180;
 
     const x1 = centerX + outerRadius * Math.cos(startAngleRad);
     const y1 = centerY + outerRadius * Math.sin(startAngleRad);
@@ -191,75 +186,70 @@ const ActivityTracker = () => {
       'Z'
     ].join(' ');
 
+    // Calculate text position (middle of the arc)
+    const midAngle = (startAngle + endAngle) / 2;
+    const midAngleRad = ((midAngle - 90) * Math.PI) / 180;
+    const textRadius = (outerRadius + innerRadius) / 2;
+    const textX = centerX + textRadius * Math.cos(midAngleRad);
+    const textY = centerY + textRadius * Math.sin(midAngleRad);
+
+    // Only show text if the slice is large enough
+    const showText = activity.duration > 60; // Show text for activities longer than 1 hour
+
     return (
-      <path
-        key={`${activity.name}-${index}`}
-        d={pathData}
-        fill={activity.color}
-        stroke="#fff"
-        strokeWidth="2"
-        className="hover:opacity-80 transition-opacity cursor-pointer"
-      />
+      <g key={`${activity.name}-${index}`}>
+        <path
+          d={pathData}
+          fill={activity.color}
+          stroke="#fff"
+          strokeWidth="2"
+          className="hover:opacity-80 transition-opacity cursor-pointer"
+        />
+        {showText && (
+          <text
+            x={textX}
+            y={textY}
+            textAnchor="middle"
+            dominantBaseline="central"
+            className="text-xs font-medium fill-white"
+            style={{ textShadow: '1px 1px 1px rgba(0,0,0,0.5)' }}
+          >
+            {activity.name.length > 12 ? activity.name.substring(0, 12) + '...' : activity.name}
+          </text>
+        )}
+      </g>
     );
   };
 
-  const createClockTickers = () => {
-    const tickers = [];
-    const clockPositions = [
-      { hour: 6, label: '6AM' },  // Top (6am)
-      { hour: 12, label: '12PM' }, // Right (12pm/noon)
-      { hour: 18, label: '6PM' },  // Bottom (6pm)
-      { hour: 0, label: '12AM' }   // Left (12am/midnight)
-    ];
+  const createClockNumbers = () => {
+    const numbers = [];
+    const centerX = 250;
+    const centerY = 250;
+    const radius = 220;
 
-    clockPositions.forEach(({ hour, label }) => {
-      // Map to clock position: 6am at top (0°), rotating clockwise
-      const angle = ((hour - 6) / 24) * 360;
-      const angleRad = (angle * Math.PI) / 180;
-      const centerX = 200;
-      const centerY = 200;
-      
-      const outerRadius = 180;
-      const innerRadius = 165;
-      
-      const x1 = centerX + innerRadius * Math.cos(angleRad);
-      const y1 = centerY + innerRadius * Math.sin(angleRad);
-      const x2 = centerX + outerRadius * Math.cos(angleRad);
-      const y2 = centerY + outerRadius * Math.sin(angleRad);
+    for (let i = 1; i <= 12; i++) {
+      const angle = ((i * 30) - 90) * Math.PI / 180; // 30 degrees per hour, -90 to start from top
+      const x = centerX + radius * Math.cos(angle);
+      const y = centerY + radius * Math.sin(angle);
 
-      tickers.push(
-        <line
-          key={hour}
-          x1={x1}
-          y1={y1}
-          x2={x2}
-          y2={y2}
-          stroke="#64748b"
-          strokeWidth="3"
-        />
-      );
-
-      const textRadius = 195;
-      const textX = centerX + textRadius * Math.cos(angleRad);
-      const textY = centerY + textRadius * Math.sin(angleRad);
-      
-      tickers.push(
+      numbers.push(
         <text
-          key={`text-${hour}`}
-          x={textX}
-          y={textY}
+          key={i}
+          x={x}
+          y={y}
           textAnchor="middle"
           dominantBaseline="central"
-          className="text-sm font-semibold fill-slate-600"
+          className="text-lg font-bold fill-slate-700"
         >
-          {label}
+          {i}
         </text>
       );
-    });
+    }
 
-    return tickers;
+    return numbers;
   };
 
+  // Separate activities by time of day
   const daytimeActivities = activities.filter(a => a.isDaytime);
   const nighttimeActivities = activities.filter(a => !a.isDaytime);
 
@@ -305,9 +295,9 @@ const ActivityTracker = () => {
                 <p className="font-medium mb-2">Expected format:</p>
                 <div className="bg-slate-50 p-3 rounded text-xs font-mono">
                   start, end, activity<br/>
-                  06.00, 07.00, Gym<br/>
-                  07.30, 17.00, Work<br/>
-                  22.00, 06.00, Sleep
+                  06:00, 07:00, Gym<br/>
+                  07:30, 17:00, Work<br/>
+                  22:00, 06:00, Sleep
                 </div>
               </div>
 
@@ -328,9 +318,9 @@ const ActivityTracker = () => {
             <CardContent>
               {activities.length > 0 ? (
                 <div ref={chartRef} className="flex flex-col items-center bg-white p-6 rounded-lg">
-                  <svg width="400" height="400" className="mb-6">
-                    {/* Clock tickers */}
-                    {createClockTickers()}
+                  <svg width="500" height="500" className="mb-6">
+                    {/* Clock numbers */}
+                    {createClockNumbers()}
                     
                     {/* Inner ring (6am-6pm) */}
                     {daytimeActivities.map((activity, index) => 
@@ -343,16 +333,16 @@ const ActivityTracker = () => {
                     )}
                     
                     {/* Center labels */}
-                    <text x="200" y="190" textAnchor="middle" className="text-sm font-semibold fill-slate-700">
+                    <text x="250" y="235" textAnchor="middle" className="text-sm font-semibold fill-slate-700">
                       Day Activities
                     </text>
-                    <text x="200" y="205" textAnchor="middle" className="text-xs fill-slate-500">
+                    <text x="250" y="250" textAnchor="middle" className="text-xs fill-slate-500">
                       6AM - 6PM
                     </text>
-                    <text x="200" y="220" textAnchor="middle" className="text-sm font-semibold fill-slate-700">
+                    <text x="250" y="265" textAnchor="middle" className="text-sm font-semibold fill-slate-700">
                       Night Activities
                     </text>
-                    <text x="200" y="235" textAnchor="middle" className="text-xs fill-slate-500">
+                    <text x="250" y="280" textAnchor="middle" className="text-xs fill-slate-500">
                       6PM - 6AM
                     </text>
                   </svg>
