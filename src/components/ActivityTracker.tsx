@@ -80,14 +80,29 @@ const ActivityTracker = () => {
           const lines = text.split('\n').filter(line => line.trim());
           const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
           
+          console.log('CSV Headers:', headers);
+          
+          // Find the indices for start, end, and activity/label columns
+          const startIndex = headers.findIndex(h => h === 'start');
+          const endIndex = headers.findIndex(h => h === 'end');
+          const activityIndex = headers.findIndex(h => h === 'activity' || h === 'label');
+          
+          console.log('Column indices:', { startIndex, endIndex, activityIndex });
+          
+          if (startIndex === -1 || endIndex === -1 || activityIndex === -1) {
+            throw new Error('Required columns not found. Expected: start, end, activity/label');
+          }
+          
           parsedData = lines.slice(1).map(line => {
             const values = line.split(',').map(v => v.trim());
             return {
-              start: values[0],
-              end: values[1],
-              activity: values[2] // Activity name is now in the last column
+              start: values[startIndex],
+              end: values[endIndex],
+              activity: values[activityIndex]
             };
-          });
+          }).filter(item => item.start && item.end && item.activity);
+          
+          console.log('Parsed CSV data:', parsedData);
         } else {
           // Parse Excel
           const workbook = XLSX.read(data, { type: 'binary' });
@@ -98,7 +113,7 @@ const ActivityTracker = () => {
           parsedData = jsonData.map(row => ({
             start: row.start || row.Start,
             end: row.end || row.End,
-            activity: row.activity || row.Activity
+            activity: row.activity || row.Activity || row.label || row.Label
           }));
         }
 
@@ -110,6 +125,7 @@ const ActivityTracker = () => {
           description: `Processed ${processed.length} activities`,
         });
       } catch (error) {
+        console.error('File parsing error:', error);
         toast({
           title: "Error parsing file",
           description: "Please check your file format",
@@ -294,7 +310,7 @@ const ActivityTracker = () => {
               <div className="text-sm text-slate-600">
                 <p className="font-medium mb-2">Expected format:</p>
                 <div className="bg-slate-50 p-3 rounded text-xs font-mono">
-                  start, end, activity<br/>
+                  start, end, label<br/>
                   06:00, 07:00, Gym<br/>
                   07:30, 17:00, Work<br/>
                   22:00, 06:00, Sleep
