@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Upload, Download, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,7 +19,9 @@ interface ProcessedActivity {
   endMinutes: number;
   duration: number;
   color: string;
-  isDaytime: boolean;
+  zone: 'inner' | 'outer';
+  startAngle: number;
+  endAngle: number;
 }
 
 const ActivityTracker = () => {
@@ -38,18 +41,42 @@ const ActivityTracker = () => {
     return parseInt(hours) * 60 + (parseInt(minutes) || 0);
   };
 
+  // Convert time to angle on a 12-hour clock (following vanilla JS logic)
+  const timeToAngle = (timeMinutes: number): number => {
+    // Convert to hours and minutes
+    const hours = Math.floor(timeMinutes / 60);
+    const minutes = timeMinutes % 60;
+    
+    // Convert to 12-hour clock format (0-12 hours)
+    const h = hours % 12;
+    const angle = h * 30 + (minutes / 60) * 30;
+    
+    // Rotate so 12 is at the top (subtract 90 degrees)
+    return (angle - 90 + 360) % 360;
+  };
+
+  // Determine if time is in inner or outer zone
+  const getZone = (timeMinutes: number): 'inner' | 'outer' => {
+    const hour = Math.floor(timeMinutes / 60);
+    return (hour >= 6 && hour < 18) ? 'inner' : 'outer';
+  };
+
   const processActivities = (rawActivities: Activity[]): ProcessedActivity[] => {
     return rawActivities.map((activity, index) => {
       const startMinutes = timeToMinutes(activity.start);
-      const endMinutes = timeToMinutes(activity.end);
+      let endMinutes = timeToMinutes(activity.end);
       
       // Handle overnight activities
-      const duration = endMinutes > startMinutes 
-        ? endMinutes - startMinutes 
-        : (24 * 60) - startMinutes + endMinutes;
+      if (endMinutes <= startMinutes) {
+        endMinutes += 24 * 60; // Add 24 hours
+      }
 
-      const startHour = Math.floor(startMinutes / 60);
-      const isDaytime = startHour >= 6 && startHour < 18;
+      const duration = endMinutes - startMinutes;
+      const zone = getZone(startMinutes);
+      
+      // Calculate angles using the corrected logic
+      const startAngle = timeToAngle(startMinutes);
+      const endAngle = timeToAngle(endMinutes % (24 * 60));
 
       return {
         name: activity.activity,
@@ -57,7 +84,9 @@ const ActivityTracker = () => {
         endMinutes,
         duration,
         color: colors[index % colors.length],
-        isDaytime
+        zone,
+        startAngle,
+        endAngle
       };
     });
   };
@@ -168,49 +197,21 @@ const ActivityTracker = () => {
     }
   };
 
-  const createPieSlice = (activity: ProcessedActivity, index: number, isInnerRing: boolean) => {
-    let startMinutes, duration;
-    
-    if (isInnerRing) {
-      // Inner ring: 6AM to 6PM (12 hours)
-      if (activity.isDaytime) {
-        // Convert 24-hour format to 12-hour format starting from 6AM (360 minutes)
-        // 6:00 becomes 0, 7:00 becomes 60, 18:00 becomes 720 (12 hours)
-        startMinutes = activity.startMinutes - 360;
-        duration = activity.duration;
-      } else {
-        return null; // Don't render nighttime activities in inner ring
-      }
-    } else {
-      // Outer ring: 6PM to 6AM (12 hours)
-      if (!activity.isDaytime) {
-        // For nighttime activities, we need to map them to a 12-hour cycle
-        if (activity.startMinutes >= 18 * 60) {
-          // Evening activities (18:00 to 23:59): map to 0-359 minutes
-          // 18:00 (1080 min) becomes 0, 20:30 (1230 min) becomes 150
-          startMinutes = activity.startMinutes - 18 * 60;
-        } else {
-          // Early morning activities (00:00 to 05:59): map to 360-719 minutes  
-          // 00:00 becomes 360 (6 hours into the cycle), 06:00 becomes 720 (12 hours)
-          startMinutes = activity.startMinutes + 6 * 60;
-        }
-        duration = activity.duration;
-      } else {
-        return null; // Don't render daytime activities in outer ring
-      }
-    }
-    
-    const totalMinutes = 12 * 60; // 12 hours for each ring
-    const startAngle = (startMinutes / totalMinutes) * 360;
-    const endAngle = startAngle + (duration / totalMinutes) * 360;
-    
+  const createPieSlice = (activity: ProcessedActivity, index: number) => {
     const centerX = 250;
     const centerY = 250;
-    const outerRadius = isInnerRing ? 150 : 200;
-    const innerRadius = isInnerRing ? 80 : 150;
+    const outerRadius = activity.zone === 'inner' ? 150 : 200;
+    const innerRadius = activity.zone === 'inner' ? 80 : 150;
 
-    const startAngleRad = ((startAngle - 90) * Math.PI) / 180; // -90 to start from top
-    const endAngleRad = ((endAngle - 90) * Math.PI) / 180;
+    const startAngleRad = (activity.startAngle * Math.PI) / 180;
+    let endAngleRad = (activity.endAngle * Math.PI) / 180;
+    
+    // Handle angle wrapping for overnight activities
+    let angleWidth = activity.endAngle - activity.startAngle;
+    if (angleWidth <= 0) {
+      angleWidth += 360;
+      endAngleRad = ((activity.endAngle + 360) * Math.PI) / 180;
+    }
 
     const x1 = centerX + outerRadius * Math.cos(startAngleRad);
     const y1 = centerY + outerRadius * Math.sin(startAngleRad);
@@ -221,7 +222,7 @@ const ActivityTracker = () => {
     const x4 = centerX + innerRadius * Math.cos(startAngleRad);
     const y4 = centerY + innerRadius * Math.sin(startAngleRad);
 
-    const largeArcFlag = endAngle - startAngle > 180 ? 1 : 0;
+    const largeArcFlag = angleWidth > 180 ? 1 : 0;
 
     const pathData = [
       `M ${x1} ${y1}`,
@@ -232,17 +233,17 @@ const ActivityTracker = () => {
     ].join(' ');
 
     // Calculate text position (middle of the arc)
-    const midAngle = (startAngle + endAngle) / 2;
-    const midAngleRad = ((midAngle - 90) * Math.PI) / 180;
+    const midAngle = activity.startAngle + angleWidth / 2;
+    const midAngleRad = (midAngle * Math.PI) / 180;
     const textRadius = (outerRadius + innerRadius) / 2;
     const textX = centerX + textRadius * Math.cos(midAngleRad);
     const textY = centerY + textRadius * Math.sin(midAngleRad);
 
     // Only show text if the slice is large enough
-    const showText = duration > 60; // Show text for activities longer than 1 hour
+    const showText = activity.duration > 60; // Show text for activities longer than 1 hour
 
     return (
-      <g key={`${activity.name}-${index}-${isInnerRing ? 'inner' : 'outer'}`}>
+      <g key={`${activity.name}-${index}`}>
         <path
           d={pathData}
           fill={activity.color}
@@ -294,9 +295,9 @@ const ActivityTracker = () => {
     return numbers;
   };
 
-  // Separate activities by time of day
-  const daytimeActivities = activities.filter(a => a.isDaytime);
-  const nighttimeActivities = activities.filter(a => !a.isDaytime);
+  // Separate activities by zone
+  const innerActivities = activities.filter(a => a.zone === 'inner');
+  const outerActivities = activities.filter(a => a.zone === 'outer');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
@@ -368,13 +369,13 @@ const ActivityTracker = () => {
                     {createClockNumbers()}
                     
                     {/* Inner ring (6am-6pm) - Daytime activities */}
-                    {daytimeActivities.map((activity, index) => 
-                      createPieSlice(activity, index, true)
+                    {innerActivities.map((activity, index) => 
+                      createPieSlice(activity, index)
                     )}
                     
                     {/* Outer ring (6pm-6am) - Nighttime activities */}
-                    {nighttimeActivities.map((activity, index) => 
-                      createPieSlice(activity, index, false)
+                    {outerActivities.map((activity, index) => 
+                      createPieSlice(activity, index)
                     )}
                     
                     {/* Center labels */}
