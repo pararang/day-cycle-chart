@@ -174,8 +174,9 @@ const ActivityTracker = () => {
     if (isInnerRing) {
       // Inner ring: 6AM to 6PM (12 hours)
       if (activity.isDaytime) {
-        // Convert 24-hour format to 12-hour format starting from 6AM
-        startMinutes = activity.startMinutes - 360; // Subtract 6 hours (360 minutes) to start from 0
+        // Convert 24-hour format to 12-hour format starting from 6AM (360 minutes)
+        // 6:00 becomes 0, 7:00 becomes 60, 18:00 becomes 720 (12 hours)
+        startMinutes = activity.startMinutes - 360;
         duration = activity.duration;
       } else {
         return null; // Don't render nighttime activities in inner ring
@@ -183,12 +184,14 @@ const ActivityTracker = () => {
     } else {
       // Outer ring: 6PM to 6AM (12 hours)
       if (!activity.isDaytime) {
-        // Convert 24-hour format to 12-hour format for nighttime
+        // For nighttime activities, we need to map them to a 12-hour cycle
         if (activity.startMinutes >= 18 * 60) {
-          // Evening activities (6PM to midnight): 18:00 becomes 0, 20:30 becomes 150 minutes (2.5 hours)
+          // Evening activities (18:00 to 23:59): map to 0-359 minutes
+          // 18:00 (1080 min) becomes 0, 20:30 (1230 min) becomes 150
           startMinutes = activity.startMinutes - 18 * 60;
         } else {
-          // Early morning activities (midnight to 6AM): 06:00 becomes 12*60 (12 hours), 02:00 becomes 8*60
+          // Early morning activities (00:00 to 05:59): map to 360-719 minutes  
+          // 00:00 becomes 360 (6 hours into the cycle), 06:00 becomes 720 (12 hours)
           startMinutes = activity.startMinutes + 6 * 60;
         }
         duration = activity.duration;
