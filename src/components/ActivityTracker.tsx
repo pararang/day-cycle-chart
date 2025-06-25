@@ -272,24 +272,38 @@ const ActivityTracker = () => {
     const centerX = 250;
     const centerY = 250;
     const radius = 220;
+    const lineLength = 210; // slightly longer than radius so lines are visible for each number
 
     for (let i = 1; i <= 12; i++) {
       const angle = ((i * 30) - 90) * Math.PI / 180; // 30 degrees per hour, -90 to start from top
       const x = centerX + radius * Math.cos(angle);
       const y = centerY + radius * Math.sin(angle);
 
+      // Line endpoint (from center to just before the number)
+      const lineX = centerX + lineLength * Math.cos(angle);
+      const lineY = centerY + lineLength * Math.sin(angle);
+
       numbers.push(
-        <text
-          key={i}
-          x={x}
-          y={y}
-          textAnchor="middle"
-          dominantBaseline="central"
-          fontSize={'0.7rem'}
-          className="font-bold fill-slate-700"
-        >
-          {i}
-        </text>
+        <g key={i}>
+          <line
+            x1={centerX}
+            y1={centerY}
+            x2={lineX}
+            y2={lineY}
+            stroke="#cbd5e1"
+            strokeWidth={1}
+          />
+          <text
+            x={x}
+            y={y}
+            textAnchor="middle"
+            dominantBaseline="central"
+            fontSize={'0.7rem'}
+            className="font-bold fill-slate-700"
+          >
+            {i}
+          </text>
+        </g>
       );
     }
 
