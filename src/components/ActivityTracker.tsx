@@ -332,9 +332,9 @@ const ActivityTracker = () => {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-slate-800 mb-2 flex items-center justify-center gap-3">
             <Clock className="text-blue-600" size={40} />
-            Daily Activity Tracker
+            Daily Activity Chart
           </h1>
-          <p className="text-slate-600 text-lg">Visualize your 24-hour schedule with interactive pie charts</p>
+          <p className="text-slate-600 text-lg">Visualize your 24-hour schedule with interactive pie charts that represent the clock</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-1">
