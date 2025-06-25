@@ -199,8 +199,8 @@ const ActivityTracker = () => {
   const createPieSlice = (activity: ProcessedActivity, index: number) => {
     const centerX = 250;
     const centerY = 250;
-    const outerRadius = activity.zone === 'inner' ? 150 : 200;
-    const innerRadius = activity.zone === 'inner' ? 80 : 150;
+    const outerRadius = activity.zone === 'inner' ? 120 : 200;
+    const innerRadius = activity.zone === 'inner' ? 0 : 130;
 
     const startAngleRad = (activity.startAngle * Math.PI) / 180;
     let endAngleRad = (activity.endAngle * Math.PI) / 180;
@@ -247,7 +247,7 @@ const ActivityTracker = () => {
           d={pathData}
           fill={activity.color}
           stroke="#fff"
-          strokeWidth="2"
+          strokeWidth='0.5'
           className="hover:opacity-80 transition-opacity cursor-pointer"
         />
         {showText && (
