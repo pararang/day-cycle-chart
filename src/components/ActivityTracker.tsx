@@ -371,12 +371,11 @@ const ActivityTracker = () => {
                 </div>
               </div>
 
-              <div>
-                <div className="flex justify-center mb-2">
-                  <span className="font-semibold text-slate-700 text-center text-sm">
-                    Day Activities (6AM - 6PM) - Night Activities (6PM - 6AM)
-                  </span>
-                </div>
+              <div className="h-6" />
+              <div className="flex mb-4 justify-end">
+                <h2 className="text-slate-700 text-sm text-right">
+                  Day Activities (6AM - 6PM, Inner slices)<br />Night Activities (6PM - 6AM, Outer slices)
+                </h2>
               </div>
 
               {activities.length > 0 ? (
