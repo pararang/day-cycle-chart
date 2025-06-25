@@ -381,7 +381,7 @@ const ActivityTracker = () => {
                     )}
 
                     {/* Center labels */}
-                    <text x="250" y="235" textAnchor="middle" fontSize={'0.5rem'} className="font-semibold fill-slate-700">
+                    {/* <text x="250" y="235" textAnchor="middle" fontSize={'0.5rem'} className="font-semibold fill-slate-700">
                       Day Activities
                     </text>
                     <text x="250" y="250" textAnchor="middle" fontSize={'0.5rem'} className="fill-slate-500">
@@ -392,7 +392,7 @@ const ActivityTracker = () => {
                     </text>
                     <text x="250" y="280" textAnchor="middle" fontSize={'0.5rem'} className="fill-slate-500">
                       6PM - 6AM
-                    </text>
+                    </text> */}
                   </svg>
 
                   {/* Legend */}
