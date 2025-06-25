@@ -252,14 +252,15 @@ const ActivityTracker = () => {
         />
         {showText && (
           <text
-            x={textX}
-            y={textY}
-            textAnchor="middle"
-            dominantBaseline="central"
-            className="text-xs font-medium fill-white"
-            style={{ textShadow: '1px 1px 1px rgb(0, 0, 0)' }}
+        x={textX}
+        y={textY}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={activity.name.length > 12 ? '0.3rem' : '0.5rem'}
+        className="fill-white"
+        style={{ textShadow: '1px 1px 1px rgb(0, 0, 0)' }}
           >
-            {activity.name.length > 12 ? activity.name.substring(0, 12) + '...' : activity.name}
+        {activity.name.length > 12 ? activity.name.substring(0, 12) + '...' : activity.name}
           </text>
         )}
       </g>
