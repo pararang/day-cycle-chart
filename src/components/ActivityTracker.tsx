@@ -421,7 +421,7 @@ const ActivityTracker = () => {
                   </svg>
 
                   {/* Legend */}
-                  <div className="activity-legend grid grid-cols-2 gap-4 w-full max-w-md">
+                  <div className="activity-legend grid grid-cols-3 gap-2 w-full">
                     {activities.map((activity, index) => (
                       <div key={index} className="flex items-center gap-2">
                         <div
