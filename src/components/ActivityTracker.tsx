@@ -45,11 +45,11 @@ const ActivityTracker = () => {
     // Convert to hours and minutes
     const hours = Math.floor(timeMinutes / 60);
     const minutes = timeMinutes % 60;
-    
+
     // Convert to 12-hour clock format (0-12 hours)
     const h = hours % 12;
     const angle = h * 30 + (minutes / 60) * 30;
-    
+
     // Rotate so 12 is at the top (subtract 90 degrees)
     return (angle - 90 + 360) % 360;
   };
@@ -64,7 +64,7 @@ const ActivityTracker = () => {
     return rawActivities.map((activity, index) => {
       const startMinutes = timeToMinutes(activity.start);
       let endMinutes = timeToMinutes(activity.end);
-      
+
       // Handle overnight activities
       if (endMinutes <= startMinutes) {
         endMinutes += 24 * 60; // Add 24 hours
@@ -72,7 +72,7 @@ const ActivityTracker = () => {
 
       const duration = endMinutes - startMinutes;
       const zone = getZone(startMinutes);
-      
+
       // Calculate angles using the corrected logic
       const startAngle = timeToAngle(startMinutes);
       const endAngle = timeToAngle(endMinutes % (24 * 60));
@@ -107,20 +107,20 @@ const ActivityTracker = () => {
           const text = data as string;
           const lines = text.split('\n').filter(line => line.trim());
           const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
-          
+
           console.log('CSV Headers:', headers);
-          
+
           // Find the indices for start, end, and activity/label columns
           const startIndex = headers.findIndex(h => h === 'start');
           const endIndex = headers.findIndex(h => h === 'end');
           const activityIndex = headers.findIndex(h => h === 'activity' || h === 'label');
-          
+
           console.log('Column indices:', { startIndex, endIndex, activityIndex });
-          
+
           if (startIndex === -1 || endIndex === -1 || activityIndex === -1) {
             throw new Error('Required columns not found. Expected: start, end, activity/label');
           }
-          
+
           parsedData = lines.slice(1).map(line => {
             const values = line.split(',').map(v => v.trim());
             return {
@@ -129,7 +129,7 @@ const ActivityTracker = () => {
               activity: values[activityIndex]
             };
           }).filter(item => item.start && item.end && item.activity);
-          
+
           console.log('Parsed CSV data:', parsedData);
         } else {
           // Parse Excel
@@ -137,7 +137,7 @@ const ActivityTracker = () => {
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
           const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
-          
+
           parsedData = jsonData.map(row => ({
             start: row.start || row.Start,
             end: row.end || row.End,
@@ -147,7 +147,7 @@ const ActivityTracker = () => {
 
         const processed = processActivities(parsedData);
         setActivities(processed);
-        
+
         toast({
           title: "File uploaded successfully!",
           description: `Processed ${processed.length} activities`,
@@ -177,12 +177,12 @@ const ActivityTracker = () => {
         backgroundColor: '#ffffff',
         scale: 2,
       });
-      
+
       const link = document.createElement('a');
       link.download = 'activity-chart.png';
       link.href = canvas.toDataURL();
       link.click();
-      
+
       toast({
         title: "Chart downloaded!",
         description: "Your activity chart has been saved",
@@ -204,7 +204,7 @@ const ActivityTracker = () => {
 
     const startAngleRad = (activity.startAngle * Math.PI) / 180;
     let endAngleRad = (activity.endAngle * Math.PI) / 180;
-    
+
     // Handle angle wrapping for overnight activities
     let angleWidth = activity.endAngle - activity.startAngle;
     if (angleWidth <= 0) {
@@ -252,15 +252,15 @@ const ActivityTracker = () => {
         />
         {showText && (
           <text
-        x={textX}
-        y={textY}
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontSize={activity.name.length > 12 ? '0.3rem' : '0.5rem'}
-        className="fill-white"
-        style={{ textShadow: '1px 1px 1px rgb(0, 0, 0)' }}
+            x={textX}
+            y={textY}
+            textAnchor="middle"
+            dominantBaseline="central"
+            fontSize={activity.name.length > 12 ? '0.3rem' : '0.5rem'}
+            className="fill-white"
+            style={{ textShadow: '1px 1px 1px rgb(0, 0, 0)' }}
           >
-        {activity.name.length > 12 ? activity.name.substring(0, 12) + '...' : activity.name}
+            {activity.name.length > 12 ? activity.name.substring(0, 12) + '...' : activity.name}
           </text>
         )}
       </g>
@@ -334,65 +334,73 @@ const ActivityTracker = () => {
                   </p>
                 )}
               </div>
-              
+
               <div className="text-sm text-slate-600">
                 <p className="font-medium mb-2">Expected format:</p>
                 <div className="bg-slate-50 p-3 rounded text-xs font-mono">
-                  start, end, label<br/>
-                  06:00, 07:00, Gym<br/>
-                  07:30, 17:00, Work<br/>
+                  start, end, label<br />
+                  06:00, 07:00, Gym<br />
+                  07:30, 17:00, Work<br />
                   22:00, 06:00, Sleep
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-center mb-2">
+                  <span className="font-semibold text-slate-700 text-center text-sm">
+                    Day Activities (6AM - 6PM) - Night Activities (6PM - 6AM)
+                  </span>
                 </div>
               </div>
 
               {activities.length > 0 ? (
                 <div ref={chartRef} className="flex flex-col items-center bg-white p-6 rounded-lg">
-                    {/* Responsive SVG chart */}
-                    <svg
-                      width="100%"
-                      height="100%"
-                      viewBox="0 0 500 500"
-                      style={{
-                        maxWidth: '80vw',
-                        height: 'auto',
-                        display: 'block',
-                        marginBottom: '1.5rem'
-                      }}
-                    >
-                      {/* Clock numbers */}
-                      {createClockNumbers()}
+                  {/* Responsive SVG chart */}
+                  <svg
+                    width="100%"
+                    height="100%"
+                    viewBox="0 0 500 500"
+                    style={{
+                      maxWidth: '80vw',
+                      height: 'auto',
+                      display: 'block',
+                      marginBottom: '1.5rem'
+                    }}
+                  >
+                    {/* Clock numbers */}
+                    {createClockNumbers()}
 
-                      {/* Inner ring (6am-6pm) - Daytime activities */}
-                      {innerActivities.map((activity, index) => 
-                        createPieSlice(activity, index)
-                      )}
+                    {/* Inner ring (6am-6pm) - Daytime activities */}
+                    {innerActivities.map((activity, index) =>
+                      createPieSlice(activity, index)
+                    )}
 
-                      {/* Outer ring (6pm-6am) - Nighttime activities */}
-                      {outerActivities.map((activity, index) => 
-                        createPieSlice(activity, index)
-                      )}
+                    {/* Outer ring (6pm-6am) - Nighttime activities */}
+                    {outerActivities.map((activity, index) =>
+                      createPieSlice(activity, index)
+                    )}
 
-                      {/* Center labels */}
-                      <text x="250" y="235" textAnchor="middle" fontSize={'0.5rem'} className="font-semibold fill-slate-700">
-                        Day Activities
-                      </text>
-                      <text x="250" y="250" textAnchor="middle" fontSize={'0.5rem'} className="fill-slate-500">
-                        6AM - 6PM
-                      </text>
-                      <text x="250" y="265" textAnchor="middle" fontSize={'0.5rem'} className="font-semibold fill-slate-700">
-                        Night Activities
-                      </text>
-                      <text x="250" y="280" textAnchor="middle" fontSize={'0.5rem'} className="fill-slate-500">
-                        6PM - 6AM
-                      </text>
-                    </svg>
+                    {/* Center labels */}
+                    <text x="250" y="235" textAnchor="middle" fontSize={'0.5rem'} className="font-semibold fill-slate-700">
+                      Day Activities
+                    </text>
+                    <text x="250" y="250" textAnchor="middle" fontSize={'0.5rem'} className="fill-slate-500">
+                      6AM - 6PM
+                    </text>
+                    <text x="250" y="265" textAnchor="middle" fontSize={'0.5rem'} className="font-semibold fill-slate-700">
+                      Night Activities
+                    </text>
+                    <text x="250" y="280" textAnchor="middle" fontSize={'0.5rem'} className="fill-slate-500">
+                      6PM - 6AM
+                    </text>
+                  </svg>
 
                   {/* Legend */}
                   <div className="activity-legend grid grid-cols-2 gap-4 w-full max-w-md">
                     {activities.map((activity, index) => (
                       <div key={index} className="flex items-center gap-2">
-                        <div 
-                          className="w-4 h-4 rounded" 
+                        <div
+                          className="w-4 h-4 rounded"
                           style={{ backgroundColor: activity.color }}
                         />
                         <span className="text-sm text-slate-700">
