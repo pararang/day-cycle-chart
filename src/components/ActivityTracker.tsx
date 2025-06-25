@@ -451,6 +451,16 @@ const ActivityTracker = () => {
             </CardContent>
           </Card>
         </div>
+        <div className="text-center mb-8">
+          <ul className="mt-8 text-center text-xs text-slate-500 space-y-1">
+            <li>
+              Made by <a href='https://pararang.com'>pararang</a>
+            </li>
+            <li>
+              <a target="_blank" rel="noopener noreferrer" href="https://icons8.com/icon/42788/clock">Favicon</a> by <a target="_blank" rel="noopener noreferrer" href="https://icons8.com">Icons8</a>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   );
