@@ -237,7 +237,7 @@ const ActivityTracker = () => {
     // Adjust text radius: for outer zone, keep label further inside
     let textRadius;
     if (activity.zone === 'outer') {
-      textRadius = innerRadius + (outerRadius - innerRadius) * 0.20; // 65% out from innerRadius
+      textRadius = innerRadius + (outerRadius - innerRadius) * 0.10; // 65% out from innerRadius
     } else {
       textRadius = ((outerRadius + innerRadius) / 2) * 0.70; // center for inner zone
     }
