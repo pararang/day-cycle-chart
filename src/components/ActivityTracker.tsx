@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Upload, Download, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -240,7 +239,7 @@ const ActivityTracker = () => {
     const textY = centerY + textRadius * Math.sin(midAngleRad);
 
     // Only show text if the slice is large enough
-    const showText = activity.duration > 60; // Show text for activities longer than 1 hour
+    const showText = true; //activity.duration > 60; // Show text for activities longer than 1 hour
 
     return (
       <g key={`${activity.name}-${index}`}>
@@ -258,7 +257,7 @@ const ActivityTracker = () => {
             textAnchor="middle"
             dominantBaseline="central"
             className="text-xs font-medium fill-white"
-            style={{ textShadow: '1px 1px 1px rgba(0,0,0,0.5)' }}
+            style={{ textShadow: '1px 1px 1px rgb(0, 0, 0)' }}
           >
             {activity.name.length > 12 ? activity.name.substring(0, 12) + '...' : activity.name}
           </text>
@@ -310,16 +309,13 @@ const ActivityTracker = () => {
           <p className="text-slate-600 text-lg">Visualize your 24-hour schedule with interactive pie charts</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Upload Section */}
-          <Card className="lg:col-span-1">
+        <div className="grid grid-cols-1 lg:grid-cols-1">
+          {/* Chart Section */}
+          <Card className="lg:col-span-full">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Upload size={20} />
-                Upload Schedule
-              </CardTitle>
+              <CardTitle>24-Hour Activity Visualization</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
               <div>
                 <label className="block text-sm font-medium mb-2">
                   Upload CSV or Excel file
@@ -347,54 +343,50 @@ const ActivityTracker = () => {
                 </div>
               </div>
 
-              {activities.length > 0 && (
-                <Button onClick={downloadChart} className="w-full" variant="outline">
-                  <Download size={16} className="mr-2" />
-                  Download Chart
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Chart Section */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>24-Hour Activity Visualization</CardTitle>
-            </CardHeader>
-            <CardContent>
               {activities.length > 0 ? (
                 <div ref={chartRef} className="flex flex-col items-center bg-white p-6 rounded-lg">
-                  <svg width="500" height="500" className="mb-6">
-                    {/* Clock numbers */}
-                    {createClockNumbers()}
-                    
-                    {/* Inner ring (6am-6pm) - Daytime activities */}
-                    {innerActivities.map((activity, index) => 
-                      createPieSlice(activity, index)
-                    )}
-                    
-                    {/* Outer ring (6pm-6am) - Nighttime activities */}
-                    {outerActivities.map((activity, index) => 
-                      createPieSlice(activity, index)
-                    )}
-                    
-                    {/* Center labels */}
-                    <text x="250" y="235" textAnchor="middle" className="text-sm font-semibold fill-slate-700">
-                      Day Activities
-                    </text>
-                    <text x="250" y="250" textAnchor="middle" className="text-xs fill-slate-500">
-                      6AM - 6PM
-                    </text>
-                    <text x="250" y="265" textAnchor="middle" className="text-sm font-semibold fill-slate-700">
-                      Night Activities
-                    </text>
-                    <text x="250" y="280" textAnchor="middle" className="text-xs fill-slate-500">
-                      6PM - 6AM
-                    </text>
-                  </svg>
+                    {/* Responsive SVG chart */}
+                    <svg
+                      width="100%"
+                      height="100%"
+                      viewBox="0 0 500 500"
+                      style={{
+                        maxWidth: '80vw',
+                        height: 'auto',
+                        display: 'block',
+                        marginBottom: '1.5rem'
+                      }}
+                    >
+                      {/* Clock numbers */}
+                      {createClockNumbers()}
+
+                      {/* Inner ring (6am-6pm) - Daytime activities */}
+                      {innerActivities.map((activity, index) => 
+                        createPieSlice(activity, index)
+                      )}
+
+                      {/* Outer ring (6pm-6am) - Nighttime activities */}
+                      {outerActivities.map((activity, index) => 
+                        createPieSlice(activity, index)
+                      )}
+
+                      {/* Center labels */}
+                      <text x="250" y="235" textAnchor="middle" className="text-sm font-semibold fill-slate-700">
+                        Day Activities
+                      </text>
+                      <text x="250" y="250" textAnchor="middle" className="text-xs fill-slate-500">
+                        6AM - 6PM
+                      </text>
+                      <text x="250" y="265" textAnchor="middle" className="text-sm font-semibold fill-slate-700">
+                        Night Activities
+                      </text>
+                      <text x="250" y="280" textAnchor="middle" className="text-xs fill-slate-500">
+                        6PM - 6AM
+                      </text>
+                    </svg>
 
                   {/* Legend */}
-                  <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+                  <div className="activity-legend grid grid-cols-2 gap-4 w-full max-w-md">
                     {activities.map((activity, index) => (
                       <div key={index} className="flex items-center gap-2">
                         <div 
@@ -413,6 +405,13 @@ const ActivityTracker = () => {
                   <Clock size={48} className="mx-auto mb-4 opacity-50" />
                   <p>Upload a file to visualize your daily activities</p>
                 </div>
+              )}
+
+              {activities.length > 0 && (
+                <Button onClick={downloadChart} className="w-full" variant="outline">
+                  <Download size={16} className="mr-2" />
+                  Download Chart
+                </Button>
               )}
             </CardContent>
           </Card>
