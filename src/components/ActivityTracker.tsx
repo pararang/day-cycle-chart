@@ -285,7 +285,8 @@ const ActivityTracker = () => {
           y={y}
           textAnchor="middle"
           dominantBaseline="central"
-          className="text-lg font-bold fill-slate-700"
+          fontSize={'0.7rem'}
+          className="font-bold fill-slate-700"
         >
           {i}
         </text>
@@ -372,16 +373,16 @@ const ActivityTracker = () => {
                       )}
 
                       {/* Center labels */}
-                      <text x="250" y="235" textAnchor="middle" className="text-sm font-semibold fill-slate-700">
+                      <text x="250" y="235" textAnchor="middle" fontSize={'0.5rem'} className="font-semibold fill-slate-700">
                         Day Activities
                       </text>
-                      <text x="250" y="250" textAnchor="middle" className="text-xs fill-slate-500">
+                      <text x="250" y="250" textAnchor="middle" fontSize={'0.5rem'} className="fill-slate-500">
                         6AM - 6PM
                       </text>
-                      <text x="250" y="265" textAnchor="middle" className="text-sm font-semibold fill-slate-700">
+                      <text x="250" y="265" textAnchor="middle" fontSize={'0.5rem'} className="font-semibold fill-slate-700">
                         Night Activities
                       </text>
-                      <text x="250" y="280" textAnchor="middle" className="text-xs fill-slate-500">
+                      <text x="250" y="280" textAnchor="middle" fontSize={'0.5rem'} className="fill-slate-500">
                         6PM - 6AM
                       </text>
                     </svg>
