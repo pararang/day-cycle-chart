@@ -234,9 +234,20 @@ const ActivityTracker = () => {
     // Calculate text position (middle of the arc)
     const midAngle = activity.startAngle + angleWidth / 2;
     const midAngleRad = (midAngle * Math.PI) / 180;
-    const textRadius = (outerRadius + innerRadius) / 2;
+    // Adjust text radius: for outer zone, keep label further inside
+    let textRadius;
+    if (activity.zone === 'outer') {
+      textRadius = innerRadius + (outerRadius - innerRadius) * 0.20; // 65% out from innerRadius
+    } else {
+      textRadius = ((outerRadius + innerRadius) / 2) * 0.70; // center for inner zone
+    }
     const textX = centerX + textRadius * Math.cos(midAngleRad);
     const textY = centerY + textRadius * Math.sin(midAngleRad);
+
+    // Determine label orientation for readability
+    const isLeftHalf = midAngle > 90 && midAngle < 270;
+    const textAnchor = isLeftHalf ? 'end' : 'start';
+    const rotation = isLeftHalf ? midAngle + 180 : midAngle;
 
     // Only show text if the slice is large enough
     const showText = true; //activity.duration > 60; // Show text for activities longer than 1 hour
@@ -254,13 +265,14 @@ const ActivityTracker = () => {
           <text
             x={textX}
             y={textY}
-            textAnchor="middle"
-            dominantBaseline="central"
-            fontSize={activity.name.length > 12 ? '0.3rem' : '0.5rem'}
-            className="fill-white"
-            style={{ textShadow: '1px 1px 1px rgb(0, 0, 0)' }}
+            textAnchor={textAnchor}
+            dominantBaseline="middle"
+            fontSize={activity.name.length > 30 ? '0.3rem' : '0.4rem'}
+            className="fill-black"
+            style={{ textShadow: '0.5px 0.5px 0.5px rgb(255, 255, 255)' }}
+            transform={`rotate(${rotation}, ${textX}, ${textY})`}
           >
-            {activity.name.length > 12 ? activity.name.substring(0, 12) + '...' : activity.name}
+            {activity.name.length > 30 ? activity.name.substring(0, 30) + '...' : activity.name}
           </text>
         )}
       </g>
