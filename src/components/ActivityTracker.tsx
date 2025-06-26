@@ -345,30 +345,32 @@ const ActivityTracker = () => {
               <CardTitle>24-Hour Activity Visualization</CardTitle>
             </CardHeader>
             <CardContent>
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Upload CSV or Excel file
-                </label>
-                <input
-                  type="file"
-                  accept=".csv,.xlsx,.xls"
-                  onChange={handleFileUpload}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-                {fileName && (
-                  <p className="text-sm text-green-600 mt-2">
-                    Loaded: {fileName}
-                  </p>
-                )}
-              </div>
-
-              <div className="text-sm text-slate-600">
-                <p className="font-medium mb-2">Expected format:</p>
-                <div className="bg-slate-50 p-3 rounded text-xs font-mono">
-                  start, end, label<br />
-                  06:00, 07:00, Gym<br />
-                  07:30, 17:00, Work<br />
-                  22:00, 06:00, Sleep
+              <div className="flex flex-col md:flex-row gap-6 mb-4">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium mb-2">
+                    Upload CSV or Excel file
+                  </label>
+                  <input
+                    type="file"
+                    accept=".csv,.xlsx,.xls"
+                    onChange={handleFileUpload}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                  />
+                  {fileName && (
+                    <p className="text-sm text-green-600 mt-2">
+                      Loaded: {fileName}
+                    </p>
+                  )}
+                </div>
+                <div className="flex-1 text-sm text-slate-600">
+                  <p className="font-medium mb-2">Expected format:</p>
+                  <div className="bg-slate-50 p-3 rounded text-xs font-mono">
+                    start, end, label<br />
+                    06:00, 07:00, Gym<br />
+                    07:30, 17:00, Work<br />
+                    22:00, 06:00, Sleep<br />
+                    ...
+                  </div>
                 </div>
               </div>
 
