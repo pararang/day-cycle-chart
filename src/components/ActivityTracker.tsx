@@ -26,6 +26,7 @@ interface ProcessedActivity {
 const ActivityTracker = () => {
   const [activities, setActivities] = useState<ProcessedActivity[]>([]);
   const [fileName, setFileName] = useState<string>('');
+  const [fullWidth, setFullWidth] = useState(false);
   const chartRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -372,69 +373,85 @@ const ActivityTracker = () => {
               </div>
 
               <div className="h-6" />
-              <div className="flex mb-4 justify-end">
-                <h2 className="text-slate-700 text-sm text-right">
-                  Day Activities (6AM - 6PM, Inner slices)<br />Night Activities (6PM - 6AM, Outer slices)
-                </h2>
-              </div>
-
-              {activities.length > 0 ? (
-                <div ref={chartRef} className="flex flex-col items-center bg-white p-6 rounded-lg">
-                  {/* Responsive SVG chart */}
-                  <svg
-                    width="100%"
-                    height="100%"
-                    viewBox="0 0 500 500"
-                    style={{
-                      maxWidth: '80vw',
-                      height: 'auto',
-                      display: 'block',
-                      marginBottom: '1.5rem'
-                    }}
-                  >
-                    {/* Clock numbers */}
-                    {createClockNumbers()}
-
-                    {/* Inner ring (6am-6pm) - Daytime activities */}
-                    {innerActivities.map((activity, index) =>
-                      createPieSlice(activity, index)
-                    )}
-
-                    {/* Outer ring (6pm-6am) - Nighttime activities */}
-                    {outerActivities.map((activity, index) =>
-                      createPieSlice(activity, index)
-                    )}
-
-                    {/* Center labels */}
-                    {/* <text x="250" y="235" textAnchor="middle" fontSize={'0.5rem'} className="font-semibold fill-slate-700">
-                      Day Activities
-                    </text>
-                    <text x="250" y="250" textAnchor="middle" fontSize={'0.5rem'} className="fill-slate-500">
-                      6AM - 6PM
-                    </text>
-                    <text x="250" y="265" textAnchor="middle" fontSize={'0.5rem'} className="font-semibold fill-slate-700">
-                      Night Activities
-                    </text>
-                    <text x="250" y="280" textAnchor="middle" fontSize={'0.5rem'} className="fill-slate-500">
-                      6PM - 6AM
-                    </text> */}
-                  </svg>
-
-                  {/* Legend */}
-                  <div className="activity-legend grid grid-cols-3 gap-2 w-full">
-                    {activities.map((activity, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <div
-                          className="w-4 h-4 rounded"
-                          style={{ backgroundColor: activity.color }}
-                        />
-                        <span className="text-sm text-slate-700">
-                          {activity.name} ({Math.round(activity.duration / 60)}h)
-                        </span>
-                      </div>
-                    ))}
+              {activities.length > 0 && (
+                <div className="flex mb-4 items-center justify-between w-full">
+                  <h2 className="text-slate-700 text-sm">
+                    Day Activities (6AM - 6PM, Inner slices)
+                    <span className="mx-2 text-slate-400">|</span>
+                    Night Activities (6PM - 6AM, Outer slices)
+                  </h2>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="fullWidthToggle"
+                      checked={fullWidth}
+                      onChange={e => setFullWidth(e.target.checked)}
+                      className="accent-blue-600"
+                    />
+                    <label htmlFor="fullWidthToggle" className="text-xs text-slate-600 cursor-pointer select-none">
+                      Use full width
+                    </label>
                   </div>
                 </div>
+              )}
+              {activities.length > 0 ? (
+                <>
+                  <div ref={chartRef} className="flex flex-col items-center bg-white p-6 rounded-lg">
+                    {/* Responsive SVG chart */}
+                    <svg
+                      width="100%"
+                      height="100%"
+                      viewBox="0 0 500 500"
+                      style={{
+                        maxWidth: fullWidth ? '90vw' : '65vw',
+                        height: 'auto',
+                        display: 'block',
+                        marginBottom: '1.5rem'
+                      }}
+                    >
+                      {/* Clock numbers */}
+                      {createClockNumbers()}
+
+                      {/* Inner ring (6am-6pm) - Daytime activities */}
+                      {innerActivities.map((activity, index) =>
+                        createPieSlice(activity, index)
+                      )}
+
+                      {/* Outer ring (6pm-6am) - Nighttime activities */}
+                      {outerActivities.map((activity, index) =>
+                        createPieSlice(activity, index)
+                      )}
+
+                      {/* Center labels */}
+                      {/* <text x="250" y="235" textAnchor="middle" fontSize={'0.5rem'} className="font-semibold fill-slate-700">
+                        Day Activities
+                      </text>
+                      <text x="250" y="250" textAnchor="middle" fontSize={'0.5rem'} className="fill-slate-500">
+                        6AM - 6PM
+                      </text>
+                      <text x="250" y="265" textAnchor="middle" fontSize={'0.5rem'} className="font-semibold fill-slate-700">
+                        Night Activities
+                      </text>
+                      <text x="250" y="280" textAnchor="middle" fontSize={'0.5rem'} className="fill-slate-500">
+                        6PM - 6AM
+                      </text> */}
+                    </svg>
+                    {/* Legend */}
+                    <div className="activity-legend grid grid-cols-4 gap-2 w-full">
+                      {activities.map((activity, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <div
+                            className="w-4 h-4 rounded"
+                            style={{ backgroundColor: activity.color }}
+                          />
+                          <span className="text-sm text-slate-700">
+                            {activity.name} ({Math.round(activity.duration / 60)}h)
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
               ) : (
                 <div className="text-center py-12 text-slate-500">
                   <Clock size={48} className="mx-auto mb-4 opacity-50" />
