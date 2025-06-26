@@ -422,7 +422,7 @@ const ActivityTracker = () => {
                       height="100%"
                       viewBox="0 0 500 500"
                       style={{
-                        maxWidth: fullWidth ? '90vw' : '65vw',
+                        maxWidth: fullWidth ? '90vw' : '60vw',
                         height: 'auto',
                         display: 'block',
                         marginBottom: '1.5rem'
