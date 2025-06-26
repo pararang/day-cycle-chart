@@ -346,6 +346,17 @@ const ActivityTracker = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col md:flex-row gap-6 mb-4">
+
+                <div className="flex-1 text-sm text-slate-600">
+                  <p className="font-medium mb-2">Expected format:</p>
+                  <div className="bg-slate-50 p-3 rounded text-xs font-mono">
+                    start, end, label<br />
+                    06:00, 07:00, Gym<br />
+                    07:30, 17:00, Work<br />
+                    22:00, 06:00, Sleep<br />
+                    ...
+                  </div>
+                </div>
                 <div className="flex-1">
                   <label className="block text-sm font-medium mb-2">
                     Upload CSV or Excel file
@@ -362,37 +373,38 @@ const ActivityTracker = () => {
                     </p>
                   )}
                 </div>
-                <div className="flex-1 text-sm text-slate-600">
-                  <p className="font-medium mb-2">Expected format:</p>
-                  <div className="bg-slate-50 p-3 rounded text-xs font-mono">
-                    start, end, label<br />
-                    06:00, 07:00, Gym<br />
-                    07:30, 17:00, Work<br />
-                    22:00, 06:00, Sleep<br />
-                    ...
-                  </div>
-                </div>
               </div>
 
               <div className="h-6" />
               {activities.length > 0 && (
-                <div className="flex mb-4 items-center justify-between w-full">
-                  <h2 className="text-slate-700 text-sm">
-                    Day Activities (6AM - 6PM, Inner slices)
-                    <span className="mx-2 text-slate-400">|</span>
-                    Night Activities (6PM - 6AM, Outer slices)
-                  </h2>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="fullWidthToggle"
-                      checked={fullWidth}
-                      onChange={e => setFullWidth(e.target.checked)}
-                      className="accent-blue-600"
-                    />
-                    <label htmlFor="fullWidthToggle" className="text-xs text-slate-600 cursor-pointer select-none">
-                      Use full width
-                    </label>
+                <div className="w-full mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Info container */}
+                    <div className="flex items-center justify-center bg-slate-50 rounded p-3">
+                      <h2 className="text-slate-700 text-sm text-center">
+                        Day Activities (6AM - 6PM, Inner slices) <br />
+                        Night Activities (6PM - 6AM, Outer slices)
+                      </h2>
+                    </div>
+                    {/* Controls container */}
+                    <div className="flex flex-col gap-2 w-full">
+                      <div className="flex w-full items-center">
+                        <input
+                          type="checkbox"
+                          id="fullWidthToggle"
+                          checked={fullWidth}
+                          onChange={e => setFullWidth(e.target.checked)}
+                          className="accent-blue-600 mr-2"
+                        />
+                        <label htmlFor="fullWidthToggle" className="text-xs text-slate-600 cursor-pointer select-none w-full">
+                          Use full width
+                        </label>
+                      </div>
+                      <Button onClick={downloadChart} className="w-full" variant="outline">
+                        <Download size={16} className="mr-2" />
+                        Download Chart
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -459,13 +471,6 @@ const ActivityTracker = () => {
                   <Clock size={48} className="mx-auto mb-4 opacity-50" />
                   <p>Upload a file to visualize your daily activities</p>
                 </div>
-              )}
-
-              {activities.length > 0 && (
-                <Button onClick={downloadChart} className="w-full" variant="outline">
-                  <Download size={16} className="mr-2" />
-                  Download Chart
-                </Button>
               )}
             </CardContent>
           </Card>
