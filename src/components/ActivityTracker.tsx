@@ -23,18 +23,20 @@ interface ProcessedActivity {
   endAngle: number;
 }
 
+const colors = [
+  '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+  '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+  '#F8C471', '#82E0AA', '#F1948A', '#F5B041', '#D7BDE2',
+  '#FFD6E0', '#B5EAD7', '#C7CEEA', '#FFDAC1', '#E2F0CB',
+  '#B5B9FF', '#FFB7B2', '#F3FFE3', '#F9F871', '#A0CED9'
+];
+
 const ActivityTracker = () => {
   const [activities, setActivities] = useState<ProcessedActivity[]>([]);
   const [fileName, setFileName] = useState<string>('');
   const [fullWidth, setFullWidth] = useState(false);
   const chartRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-
-  const colors = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-    '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
-    '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#D7BDE2'
-  ];
 
   const timeToMinutes = (timeStr: string): number => {
     const [hours, minutes] = timeStr.split(/[:.]/);
