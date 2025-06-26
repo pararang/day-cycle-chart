@@ -348,9 +348,10 @@ const ActivityTracker = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col md:flex-row gap-6 mb-4">
-
                 <div className="flex-1 text-sm text-slate-600">
-                  <p className="font-medium mb-2">Expected format:</p>
+                  <label className="block text-sm font-medium mb-2">
+                    Expected format:
+                  </label>
                   <div className="bg-slate-50 p-3 rounded text-xs font-mono">
                     start, end, label<br />
                     06:00, 07:00, Gym<br />
@@ -377,20 +378,25 @@ const ActivityTracker = () => {
                 </div>
               </div>
 
+              <div className="w-full border-t border-slate-200 my-4" />
+
               <div className="h-6" />
               {activities.length > 0 && (
                 <div className="w-full mb-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Info container */}
-                    <div className="flex items-center justify-center bg-slate-50 rounded p-3">
-                      <h2 className="text-slate-700 text-sm text-center">
+                    <div className="flex items-center justify-start bg-slate-50 rounded p-3">
+                      <h2 className="text-slate-700 text-sm">
                         Day Activities (6AM - 6PM, Inner slices) <br />
                         Night Activities (6PM - 6AM, Outer slices)
                       </h2>
                     </div>
                     {/* Controls container */}
                     <div className="flex flex-col gap-2 w-full">
-                      <div className="flex w-full items-center">
+                      <div className="flex w-full items-center justify-end">
+                        <label htmlFor="fullWidthToggle" className="text-md text-slate-600 cursor-pointer select-none">
+                          Use full width &nbsp;
+                        </label>
                         <input
                           type="checkbox"
                           id="fullWidthToggle"
@@ -398,13 +404,10 @@ const ActivityTracker = () => {
                           onChange={e => setFullWidth(e.target.checked)}
                           className="accent-blue-600 mr-2"
                         />
-                        <label htmlFor="fullWidthToggle" className="text-xs text-slate-600 cursor-pointer select-none w-full">
-                          Use full width
-                        </label>
                       </div>
                       <Button onClick={downloadChart} className="w-full" variant="outline">
                         <Download size={16} className="mr-2" />
-                        Download Chart
+                        Download
                       </Button>
                     </div>
                   </div>
