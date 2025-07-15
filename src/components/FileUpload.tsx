@@ -18,11 +18,14 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, fileName }) => {
           
           <div className="flex-1 grid md:grid-cols-2 gap-4 items-start">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Expected Format:</label>
-              <div className="bg-muted p-2 rounded text-xs font-mono">
-                <div className="font-semibold mb-1">start, end, activity</div>
-                <div className="text-muted-foreground">06:00, 07:00, Gym</div>
-              </div>
+              <label className="text-sm font-medium">Sample Format:</label>
+              <a 
+                href="/sample_activities.csv" 
+                download 
+                className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 underline"
+              >
+                Download sample_activities.csv
+              </a>
             </div>
             
             <div className="space-y-2">
