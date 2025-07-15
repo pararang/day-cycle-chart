@@ -9,44 +9,34 @@ interface FileUploadProps {
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, fileName }) => {
   return (
-    <Card className="mb-6">
-      <CardContent className="p-6">
-        <div className="flex flex-col space-y-4">
-          <div className="text-center">
-            <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Upload Your Activity Data</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Upload a CSV or Excel file with your daily activities
-            </p>
+    <Card className="mb-4">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-4">
+          <div className="flex-shrink-0">
+            <Upload className="h-8 w-8 text-muted-foreground" />
           </div>
           
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-3">
+          <div className="flex-1 grid md:grid-cols-2 gap-4 items-start">
+            <div className="space-y-2">
               <label className="text-sm font-medium">Expected Format:</label>
-              <div className="bg-muted p-4 rounded-lg text-xs font-mono">
-                <div className="font-semibold mb-2">Headers: start, end, activity</div>
-                <div className="space-y-1 text-muted-foreground">
-                  <div>06:00, 07:00, Gym</div>
-                  <div>07:30, 17:00, Work</div>
-                  <div>22:00, 06:00, Sleep</div>
-                </div>
+              <div className="bg-muted p-2 rounded text-xs font-mono">
+                <div className="font-semibold mb-1">start, end, activity</div>
+                <div className="text-muted-foreground">06:00, 07:00, Gym</div>
               </div>
             </div>
             
-            <div className="space-y-3">
+            <div className="space-y-2">
               <label className="text-sm font-medium">Choose File:</label>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept=".csv,.xlsx,.xls"
-                  onChange={onFileUpload}
-                  className="w-full p-3 border border-input rounded-lg bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
-                />
-              </div>
+              <input
+                type="file"
+                accept=".csv,.xlsx,.xls"
+                onChange={onFileUpload}
+                className="w-full p-2 text-sm border border-input rounded bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer file:mr-2 file:px-2 file:py-1 file:rounded file:border-0 file:bg-primary file:text-primary-foreground file:text-xs"
+              />
               {fileName && (
-                <div className="flex items-center space-x-2 text-sm text-green-600">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Loaded: {fileName}</span>
+                <div className="flex items-center gap-1 text-xs text-green-600">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                  <span>{fileName}</span>
                 </div>
               )}
             </div>
