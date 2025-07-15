@@ -5,9 +5,10 @@ import { Card, CardContent } from '@/components/ui/card';
 interface FileUploadProps {
   onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   fileName: string;
+  activitiesCount: number;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, fileName }) => {
+const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, fileName, activitiesCount }) => {
   return (
     <Card className="mb-4">
       <CardContent className="p-4">
@@ -27,7 +28,8 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, fileName }) => {
               {fileName && (
                 <div className="flex items-center gap-1 text-xs text-green-600">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                  <span>{fileName}</span>
+                  <span>{fileName}</span> |&nbsp;
+                  <span className="font-medium">{activitiesCount}</span> activities loaded
                 </div>
               )}
             </div>

@@ -215,14 +215,13 @@ const ActivityTracker = () => {
           </p>
         </div>
 
-        <FileUpload onFileUpload={handleFileUpload} fileName={fileName} />
+        <FileUpload onFileUpload={handleFileUpload} fileName={fileName} activitiesCount={activities.length} />
 
         {activities.length > 0 && (
           <ChartControls
             fullWidth={fullWidth}
             onFullWidthToggle={setFullWidth}
             onDownload={downloadChart}
-            activitiesCount={activities.length}
           />
         )}
 

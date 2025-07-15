@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, Maximize2, Minimize2 } from 'lucide-react';
+import { Download, Maximize2, Minimize2, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -7,28 +7,26 @@ interface ChartControlsProps {
   fullWidth: boolean;
   onFullWidthToggle: (fullWidth: boolean) => void;
   onDownload: () => void;
-  activitiesCount: number;
 }
 
 const ChartControls: React.FC<ChartControlsProps> = ({
   fullWidth,
   onFullWidthToggle,
-  onDownload,
-  activitiesCount
+  onDownload
 }) => {
   return (
     <Card className="mb-6">
       <CardContent className="p-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-4">
-            <div className="text-sm text-muted-foreground">
-              <span className="font-medium">{activitiesCount}</span> activities loaded
+            {/* <div className="text-sm text-muted-foreground">
+              <span className="font-medium">11</span> activities loaded
             </div>
-            <div className="hidden sm:block h-4 w-px bg-border"></div>
+            <div className="hidden sm:block h-4 w-px bg-border"></div> */}
             <div className="text-sm text-muted-foreground">
-              <span className="text-blue-600 font-medium">Inner ring:</span> 6AM-6PM
+              <span className="text-blue-600 font-medium">Inner ring:</span> 6AM-6PM <Sun size={14} color='black' className='inline' />
               <span className="mx-2">•</span>
-              <span className="text-purple-600 font-medium">Outer ring:</span> 6PM-6AM
+              <span className="text-purple-600 font-medium">Outer ring:</span> 6PM-6AM <Moon size={14} color='black' className='inline' />
             </div>
           </div>
           
