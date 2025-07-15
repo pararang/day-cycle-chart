@@ -165,9 +165,10 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ activities, fullWidth, ch
                   style={{ backgroundColor: activity.color }}
                 />
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium truncate">{activity.name}</div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-sm font-medium truncate">{activity.name}&nbsp;
+                    <span className="text-xs text-muted-foreground">
                     {Math.round(activity.duration / 60)}h
+                    </span>
                   </div>
                 </div>
               </div>

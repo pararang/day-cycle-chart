@@ -7,6 +7,7 @@ import FileUpload from './FileUpload';
 import ChartControls from './ChartControls';
 import ActivityChart from './ActivityChart';
 import EmptyState from './EmptyState';
+import Footer from './Footer';
 
 interface Activity {
   activity: string;
@@ -234,6 +235,8 @@ const ActivityTracker = () => {
         ) : (
           <EmptyState />
         )}
+
+        <Footer />
       </div>
     </div>
   );

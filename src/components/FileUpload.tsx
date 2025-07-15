@@ -18,18 +18,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, fileName }) => {
           
           <div className="flex-1 grid md:grid-cols-2 gap-4 items-start">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Sample Format:</label>
-              <a 
-                href="/sample_activities.csv" 
-                download 
-                className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 underline"
-              >
-                Download sample_activities.csv
-              </a>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Choose File:</label>
               <input
                 type="file"
                 accept=".csv,.xlsx,.xls"
@@ -42,6 +30,19 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, fileName }) => {
                   <span>{fileName}</span>
                 </div>
               )}
+            </div>
+            <div className="space-y-2">
+              <div className="space-y-2">
+                <label className="text-sm">See sample file: </label>
+                <a
+                  href="https://raw.githubusercontent.com/pararang/day-cycle-chart/refs/heads/main/public/sample_activities.csv"
+                  download
+                  className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 underline"
+                  target='_blank'
+                >
+                  sample_activities.csv
+                </a>
+              </div>
             </div>
           </div>
         </div>
