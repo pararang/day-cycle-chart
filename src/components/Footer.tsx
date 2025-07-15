@@ -44,7 +44,7 @@ const Footer = () => {
         <div className="mt-4 pt-4 border-t border-border/40">
           <div className="text-center text-xs text-muted-foreground">
             <p className="mb-2">
-              <a target="_blank" rel="noopener noreferrer" href="https://icons8.com/icon/42788/clock">Favicon</a> by <a target="_blank" rel="noopener noreferrer" href="https://icons8.com">Icons8</a>
+              <a target="_blank" rel="noopener noreferrer" href="https://icons8.com/icon/42788/clock">Favicon</a> by <a target="_blank" rel="noopener noreferrer" href="https://icons8.com">Icons8</a> <br /> Designed by Lovable, Assisted by Copilot and Amazon Q
             </p>
           </div>
         </div>
