@@ -1,7 +1,12 @@
-start,end,activity
-06:00,07:00,Gym
-07:30,17:00,Work
-17:30,18:30,Commute
-19:00,20:00,Dinner
-20:30,22:00,TV
-22:00,06:00,Sleep
+start,end,label
+06:00,07:00,Olahraga
+07:00,07:30,Mandi
+07:30,08:00,Sarapan
+08:00,08:30,OTW Kantor
+08:30,17:00,Ngantor
+17:00,17:30,OTW Rumah
+17:30,18:00,Mandi
+18:00,19:30,Family Time
+19:30,01:00,Football Manager
+01:00,05:00,Tidur
+05:00,06:00,Masak
