@@ -208,7 +208,7 @@ const ActivityTracker = () => {
         <div className="text-center">
           <h1 className="text-3xl font-bold flex items-center justify-center gap-3 mb-2">
             <Clock className="h-8 w-8 text-primary" />
-            Daily Activity Tracker
+            Daily Activity Visualization in 24-Hour Clock Chart
           </h1>
           <p className="text-muted-foreground">
             Visualize your 24-hour schedule with an interactive clock chart
