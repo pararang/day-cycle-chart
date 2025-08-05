@@ -35,15 +35,36 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, fileName, activit
             </div>
             <div className="space-y-2">
               <div className="space-y-2">
-                <label className="text-sm">See sample file: </label>
                 <a
                   href="https://raw.githubusercontent.com/pararang/day-cycle-chart/refs/heads/main/public/sample_activities.csv"
                   download
                   className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 underline"
                   target='_blank'
                 >
-                  sample_activities.csv
+                  take a look
                 </a>
+                <span className="text-xs text-muted-foreground"> or </span>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 underline"
+                  onClick={async () => {
+                    const response = await fetch("https://raw.githubusercontent.com/pararang/day-cycle-chart/refs/heads/main/public/sample_activities.csv");
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = "sample_activities.csv";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                  }}
+                  aria-label="Download sample CSV"
+                >
+                  download
+                </button>
+                &nbsp;
+                <span className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80">the sample CSV</span>
               </div>
             </div>
           </div>
