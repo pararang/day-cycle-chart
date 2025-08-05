@@ -239,17 +239,19 @@ const ActivityTracker = () => {
       </div>
 
       {/* Floating Saweria QR Code - Bottom Right */}
-      <div className="fixed bottom-4 right-4 z-50 animate-bounce">
-        <div className="bg-white rounded-lg shadow-lg p-2 border border-gray-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
-          <img 
-            src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://saweria.co/pararang" 
-            alt="Donate via Saweria" 
-            className="w-20 h-20"
-            title="Scan to donate via Saweria"
-          />
-          <p className="text-xs text-center text-gray-600 mt-1">Donate</p>
+      {activities.length > 0 && (
+        <div className="fixed bottom-4 left-4 z-50 animate-pulse">
+          <div className="bg-white rounded-lg shadow-lg p-2 border border-gray-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <img 
+              src="https://api.qrserver.com/v1/create-qr-code/?size=640x640&data=https://saweria.co/pararang"
+              alt="Donate via Saweria" 
+              className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40"
+              title="Scan to donate via Saweria"
+            />
+            <p className="text-xs text-center text-gray-600 mt-1">Buy me a coffee</p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
