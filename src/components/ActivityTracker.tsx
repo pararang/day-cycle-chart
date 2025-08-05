@@ -203,7 +203,7 @@ const ActivityTracker = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-6 relative">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="text-center">
           <h1 className="text-3xl font-bold flex items-center justify-center gap-3 mb-2">
@@ -236,6 +236,19 @@ const ActivityTracker = () => {
         )}
 
         <Footer />
+      </div>
+
+      {/* Floating Saweria QR Code - Bottom Right */}
+      <div className="fixed bottom-4 right-4 z-50 animate-bounce">
+        <div className="bg-white rounded-lg shadow-lg p-2 border border-gray-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
+          <img 
+            src="https://saweria.co/widgets/qr?streamKey=f5f1e6746f13f639f76227b7d25e3f73" 
+            alt="Donate via Saweria" 
+            className="w-20 h-20"
+            title="Scan to donate via Saweria"
+          />
+          <p className="text-xs text-center text-gray-600 mt-1">Donate</p>
+        </div>
       </div>
     </div>
   );
