@@ -242,7 +242,7 @@ const ActivityTracker = () => {
       <div className="fixed bottom-4 right-4 z-50 animate-bounce">
         <div className="bg-white rounded-lg shadow-lg p-2 border border-gray-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
           <img 
-            src="https://saweria.co/widgets/qr?streamKey=f5f1e6746f13f639f76227b7d25e3f73" 
+            src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://saweria.co/pararang" 
             alt="Donate via Saweria" 
             className="w-20 h-20"
             title="Scan to donate via Saweria"
