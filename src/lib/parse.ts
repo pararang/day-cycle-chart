@@ -2,7 +2,6 @@
 // CSV and Excel are two adapters that both funnel into one column resolver, so
 // header matching behaves identically regardless of format. See CONTEXT.md.
 
-import * as XLSX from 'xlsx';
 import { Activity } from './schedule';
 
 // Column header aliases, all matched case-insensitively after trimming.
@@ -78,6 +77,9 @@ export const parseActivityFile = async (file: File): Promise<Activity[]> => {
     return rowsToActivities(csvToRows(text));
   }
 
+  // Loaded on demand: xlsx is large and only needed for non-CSV uploads, so
+  // keep it out of the initial bundle.
+  const XLSX = await import('xlsx');
   const data = await readFile(file, 'binary');
   const workbook = XLSX.read(data, { type: 'binary' });
   const worksheet = workbook.Sheets[workbook.SheetNames[0]];

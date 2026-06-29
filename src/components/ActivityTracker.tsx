@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import html2canvas from 'html2canvas';
 import FileUpload from './FileUpload';
 import ChartControls from './ChartControls';
 import ActivityChart from './ActivityChart';
 import EmptyState from './EmptyState';
+import SeoContent from './SeoContent';
 import Footer from './Footer';
 import { processActivities } from '@/lib/schedule';
 import { parseActivityFile } from '@/lib/parse';
@@ -51,6 +51,9 @@ const ActivityTracker = () => {
     if (!chartRef.current) return;
 
     try {
+      // Loaded on demand: html2canvas is large and only needed when a user
+      // actually exports, so keep it out of the initial bundle.
+      const { default: html2canvas } = await import('html2canvas');
       // Capture the chart's full height plus a small bottom pad: html2canvas
       // draws text slightly below the line box, which both clips the legend's
       // `truncate` (overflow: hidden) labels and nicks the last row at the
@@ -130,6 +133,8 @@ const ActivityTracker = () => {
         ) : (
           <EmptyState />
         )}
+
+        <SeoContent />
 
         <Footer />
       </div>

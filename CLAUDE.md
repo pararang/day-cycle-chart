@@ -6,7 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 pnpm dev           # Start dev server on port 8080 (host "::")
-pnpm build         # Production build to /dist
+pnpm build         # Vite build to /dist, then prerender dist/index.html (needs Chromium, see below)
+pnpm build:vite    # Vite build only, no prerender (skip if Chromium isn't installed)
+pnpm prerender     # Prerender an already-built /dist
 pnpm build:dev     # Build in development mode (enables lovable-tagger)
 pnpm lint          # Run ESLint
 pnpm preview       # Preview production build locally
@@ -16,6 +18,22 @@ pnpm deploy        # Deploy /dist to Cloudflare Workers static assets (requires 
 There are no tests in this project.
 
 This repo enforces **pnpm** — `npm install`/`yarn` are blocked by a `preinstall` hook (`only-allow pnpm`) and `engine-strict=true`. Use `pnpm install`.
+
+### Prerendering (SEO)
+
+`pnpm build` runs `scripts/prerender.mjs` after the Vite build. It serves `/dist`
+with Vite's preview server, renders the default page in headless Chromium
+(Puppeteer), and writes the fully-populated HTML back over `dist/index.html` so
+crawlers see real content instead of an empty `<div id="root">`. The client
+bundle still re-mounts React on load, so runtime behaviour is unchanged.
+
+Puppeteer's Chromium download is skipped by pnpm's build-script sandbox. After a
+fresh `pnpm install`, run once: `npx puppeteer browsers install chrome`. If
+Chromium is unavailable, use `pnpm build:vite` for a non-prerendered build.
+
+The Open Graph share image is generated, not hand-drawn: `node scripts/generate-og.mjs`
+renders a branded card in Chromium and writes `public/og-image.png` (1200x630).
+Re-run it after changing the design.
 
 ## Architecture
 
