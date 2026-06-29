@@ -18,6 +18,13 @@ comments, and architecture discussions so names line up with concepts.
   Activities into Processed Activities. No React, no SVG. Owns time parsing,
   overnight wraparound, duration, and zone assignment.
 
+- **File parsing** (`src/lib/parse.ts`) — reads an uploaded CSV/Excel file into
+  raw Activities. CSV and Excel are two adapters that both funnel into one
+  column resolver (`rowsToActivities`), so header matching is case- and
+  whitespace-insensitive identically for either format. The `activity` column
+  also accepts `label` as an alias. Missing required columns throw; rows with a
+  blank required cell are dropped.
+
 - **Zone** — which ring an Activity sits on. `inner` = daytime ring (6AM–6PM),
   `outer` = nighttime ring (6PM–6AM). Assigned from the activity's start time.
 

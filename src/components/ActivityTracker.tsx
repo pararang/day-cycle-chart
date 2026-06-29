@@ -1,14 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import * as XLSX from 'xlsx';
 import html2canvas from 'html2canvas';
 import FileUpload from './FileUpload';
 import ChartControls from './ChartControls';
 import ActivityChart from './ActivityChart';
 import EmptyState from './EmptyState';
 import Footer from './Footer';
-import { Activity, ProcessedActivity, processActivities } from '@/lib/schedule';
+import { ProcessedActivity, processActivities } from '@/lib/schedule';
+import { parseActivityFile } from '@/lib/parse';
 
 // A Processed Activity enriched with presentation concerns for the clock chart:
 // a palette color and the SVG arc angles. Schedule facts come from the
@@ -54,86 +54,32 @@ const ActivityTracker = () => {
       endAngle: timeToAngle(activity.endMinutes % (24 * 60)),
     }));
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setFileName(file.name);
-    const reader = new FileReader();
 
-    reader.onload = (e) => {
-      try {
-        const data = e.target?.result;
-        let parsedData: Activity[] = [];
+    try {
+      const raw = await parseActivityFile(file);
+      const processed = processActivities(raw);
+      const chartActivities = toChartActivities(processed);
+      setActivities(chartActivities);
 
-        if (file.name.endsWith('.csv')) {
-          // Parse CSV
-          const text = data as string;
-          const lines = text.split('\n').filter(line => line.trim());
-          const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
-
-          console.log('CSV Headers:', headers);
-
-          // Find the indices for start, end, and activity/label columns
-          const startIndex = headers.findIndex(h => h === 'start');
-          const endIndex = headers.findIndex(h => h === 'end');
-          const activityIndex = headers.findIndex(h => h === 'activity' || h === 'label');
-
-          console.log('Column indices:', { startIndex, endIndex, activityIndex });
-
-          if (startIndex === -1 || endIndex === -1 || activityIndex === -1) {
-            throw new Error('Required columns not found. Expected: start, end, activity/label');
-          }
-
-          parsedData = lines.slice(1).map(line => {
-            const values = line.split(',').map(v => v.trim());
-            return {
-              start: values[startIndex],
-              end: values[endIndex],
-              activity: values[activityIndex]
-            };
-          }).filter(item => item.start && item.end && item.activity);
-
-          console.log('Parsed CSV data:', parsedData);
-        } else {
-          // Parse Excel
-          const workbook = XLSX.read(data, { type: 'binary' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
-
-          parsedData = jsonData.map(row => ({
-            start: row.start || row.Start,
-            end: row.end || row.End,
-            activity: row.activity || row.Activity || row.label || row.Label
-          }));
-        }
-
-        const processed = processActivities(parsedData);
-        const chartActivities = toChartActivities(processed);
-        setActivities(chartActivities);
-
-        const skipped = parsedData.length - processed.length;
-        toast({
-          title: "File uploaded successfully!",
-          description: skipped > 0
-            ? `Processed ${processed.length} activities (skipped ${skipped} invalid)`
-            : `Processed ${processed.length} activities`,
-        });
-      } catch (error) {
-        console.error('File parsing error:', error);
-        toast({
-          title: "Error parsing file",
-          description: "Please check your file format",
-          variant: "destructive",
-        });
-      }
-    };
-
-    if (file.name.endsWith('.csv')) {
-      reader.readAsText(file);
-    } else {
-      reader.readAsBinaryString(file);
+      const skipped = raw.length - processed.length;
+      toast({
+        title: "File uploaded successfully!",
+        description: skipped > 0
+          ? `Processed ${processed.length} activities (skipped ${skipped} invalid)`
+          : `Processed ${processed.length} activities`,
+      });
+    } catch (error) {
+      console.error('File parsing error:', error);
+      toast({
+        title: "Error parsing file",
+        description: "Please check your file format",
+        variant: "destructive",
+      });
     }
   };
 
