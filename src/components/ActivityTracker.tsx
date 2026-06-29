@@ -7,23 +7,9 @@ import ChartControls from './ChartControls';
 import ActivityChart from './ActivityChart';
 import EmptyState from './EmptyState';
 import Footer from './Footer';
-import { ProcessedActivity, processActivities } from '@/lib/schedule';
+import { processActivities } from '@/lib/schedule';
 import { parseActivityFile } from '@/lib/parse';
-
-// A Processed Activity enriched with a palette color for the clock chart.
-// Schedule facts come from the Schedule core; arc geometry is derived in the
-// chart-geometry module at render time.
-interface ChartActivity extends ProcessedActivity {
-  color: string;
-}
-
-const colors = [
-  '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-  '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
-  '#F8C471', '#82E0AA', '#F1948A', '#F5B041', '#D7BDE2',
-  '#FFD6E0', '#B5EAD7', '#C7CEEA', '#FFDAC1', '#E2F0CB',
-  '#B5B9FF', '#FFB7B2', '#F3FFE3', '#F9F871', '#A0CED9'
-];
+import { ChartActivity, toChartActivities } from '@/lib/chart-activity';
 
 const ActivityTracker = () => {
   const [activities, setActivities] = useState<ChartActivity[]>([]);
@@ -31,14 +17,6 @@ const ActivityTracker = () => {
   const [fullWidth, setFullWidth] = useState(false);
   const chartRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-
-  // Assign each schedule fact a palette color for the chart. Arc geometry is
-  // derived downstream by the chart-geometry module.
-  const toChartActivities = (processed: ProcessedActivity[]): ChartActivity[] =>
-    processed.map((activity, index) => ({
-      ...activity,
-      color: colors[index % colors.length],
-    }));
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

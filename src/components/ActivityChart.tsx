@@ -1,11 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { ProcessedActivity } from '@/lib/schedule';
+import { ChartActivity } from '@/lib/chart-activity';
 import { activityArc, CENTER } from '@/lib/chart-geometry';
-
-interface ChartActivity extends ProcessedActivity {
-  color: string;
-}
 
 interface ActivityChartProps {
   activities: ChartActivity[];

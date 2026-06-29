@@ -38,8 +38,10 @@ comments, and architecture discussions so names line up with concepts.
   No React. The view (`ActivityChart`) consumes its output and adds color, font,
   and text content.
 
-- **Chart Activity** — a Processed Activity plus a palette `color`, the shape the
-  chart renders. Arc geometry is derived from it on the fly, not stored on it.
+- **Chart Activity** (`src/lib/chart-activity.ts`) — a Processed Activity plus a
+  palette `color`, the shape the chart renders. Arc geometry is derived from it
+  on the fly, not stored on it. `toChartActivities` builds them, cycling the
+  palette by order.
 
 ## Invariants
 
