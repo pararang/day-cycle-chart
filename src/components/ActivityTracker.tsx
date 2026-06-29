@@ -10,13 +10,11 @@ import Footer from './Footer';
 import { ProcessedActivity, processActivities } from '@/lib/schedule';
 import { parseActivityFile } from '@/lib/parse';
 
-// A Processed Activity enriched with presentation concerns for the clock chart:
-// a palette color and the SVG arc angles. Schedule facts come from the
-// Schedule core; these are layered on at render time.
+// A Processed Activity enriched with a palette color for the clock chart.
+// Schedule facts come from the Schedule core; arc geometry is derived in the
+// chart-geometry module at render time.
 interface ChartActivity extends ProcessedActivity {
   color: string;
-  startAngle: number;
-  endAngle: number;
 }
 
 const colors = [
@@ -34,24 +32,12 @@ const ActivityTracker = () => {
   const chartRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Convert minutes-since-midnight to an angle on a 12-hour clock face,
-  // rotated so 12 sits at the top (SVG's 0° is at 3 o'clock).
-  const timeToAngle = (timeMinutes: number): number => {
-    const hours = Math.floor(timeMinutes / 60);
-    const minutes = timeMinutes % 60;
-    const h = hours % 12;
-    const angle = h * 30 + (minutes / 60) * 30;
-    return (angle - 90 + 360) % 360;
-  };
-
-  // Layer presentation concerns (palette color + arc angles) onto the
-  // schedule facts produced by the Schedule core.
+  // Assign each schedule fact a palette color for the chart. Arc geometry is
+  // derived downstream by the chart-geometry module.
   const toChartActivities = (processed: ProcessedActivity[]): ChartActivity[] =>
     processed.map((activity, index) => ({
       ...activity,
       color: colors[index % colors.length],
-      startAngle: timeToAngle(activity.startMinutes),
-      endAngle: timeToAngle(activity.endMinutes % (24 * 60)),
     }));
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {

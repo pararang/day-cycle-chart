@@ -32,6 +32,15 @@ comments, and architecture discussions so names line up with concepts.
   start (e.g. `23:30 → 06:00`), 24 hours are added to the end so `endMinutes`
   stays greater than `startMinutes`. Resolved once, in the Schedule core.
 
+- **Arc geometry** (`src/lib/chart-geometry.ts`) — the pure module that maps a
+  Processed Activity to the SVG arc path and label placement for its ring. Owns
+  minutes→angle conversion, ring radii, the large-arc flag, and label rotation.
+  No React. The view (`ActivityChart`) consumes its output and adds color, font,
+  and text content.
+
+- **Chart Activity** — a Processed Activity plus a palette `color`, the shape the
+  chart renders. Arc geometry is derived from it on the fly, not stored on it.
+
 ## Invariants
 
 - Times are 24-hour, `HH:MM` or `HH.MM`. Hours 0–23, minutes 0–59. An optional
