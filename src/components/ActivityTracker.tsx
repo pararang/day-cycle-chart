@@ -8,20 +8,13 @@ import ChartControls from './ChartControls';
 import ActivityChart from './ActivityChart';
 import EmptyState from './EmptyState';
 import Footer from './Footer';
+import { Activity, ProcessedActivity, processActivities } from '@/lib/schedule';
 
-interface Activity {
-  activity: string;
-  start: string;
-  end: string;
-}
-
-interface ProcessedActivity {
-  name: string;
-  startMinutes: number;
-  endMinutes: number;
-  duration: number;
+// A Processed Activity enriched with presentation concerns for the clock chart:
+// a palette color and the SVG arc angles. Schedule facts come from the
+// Schedule core; these are layered on at render time.
+interface ChartActivity extends ProcessedActivity {
   color: string;
-  zone: 'inner' | 'outer';
   startAngle: number;
   endAngle: number;
 }
@@ -35,66 +28,31 @@ const colors = [
 ];
 
 const ActivityTracker = () => {
-  const [activities, setActivities] = useState<ProcessedActivity[]>([]);
+  const [activities, setActivities] = useState<ChartActivity[]>([]);
   const [fileName, setFileName] = useState<string>('');
   const [fullWidth, setFullWidth] = useState(false);
   const chartRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  const timeToMinutes = (timeStr: string): number => {
-    const [hours, minutes] = timeStr.split(/[:.]/);
-    return parseInt(hours) * 60 + (parseInt(minutes) || 0);
-  };
-
-  // Convert time to angle on a 12-hour clock (following vanilla JS logic)
+  // Convert minutes-since-midnight to an angle on a 12-hour clock face,
+  // rotated so 12 sits at the top (SVG's 0° is at 3 o'clock).
   const timeToAngle = (timeMinutes: number): number => {
-    // Convert to hours and minutes
     const hours = Math.floor(timeMinutes / 60);
     const minutes = timeMinutes % 60;
-
-    // Convert to 12-hour clock format (0-12 hours)
     const h = hours % 12;
     const angle = h * 30 + (minutes / 60) * 30;
-
-    // Rotate so 12 is at the top (subtract 90 degrees)
     return (angle - 90 + 360) % 360;
   };
 
-  // Determine if time is in inner or outer zone
-  const getZone = (timeMinutes: number): 'inner' | 'outer' => {
-    const hour = Math.floor(timeMinutes / 60);
-    return (hour >= 6 && hour < 18) ? 'inner' : 'outer';
-  };
-
-  const processActivities = (rawActivities: Activity[]): ProcessedActivity[] => {
-    return rawActivities.map((activity, index) => {
-      const startMinutes = timeToMinutes(activity.start);
-      let endMinutes = timeToMinutes(activity.end);
-
-      // Handle overnight activities
-      if (endMinutes <= startMinutes) {
-        endMinutes += 24 * 60; // Add 24 hours
-      }
-
-      const duration = endMinutes - startMinutes;
-      const zone = getZone(startMinutes);
-
-      // Calculate angles using the corrected logic
-      const startAngle = timeToAngle(startMinutes);
-      const endAngle = timeToAngle(endMinutes % (24 * 60));
-
-      return {
-        name: activity.activity,
-        startMinutes,
-        endMinutes,
-        duration,
-        color: colors[index % colors.length],
-        zone,
-        startAngle,
-        endAngle
-      };
-    });
-  };
+  // Layer presentation concerns (palette color + arc angles) onto the
+  // schedule facts produced by the Schedule core.
+  const toChartActivities = (processed: ProcessedActivity[]): ChartActivity[] =>
+    processed.map((activity, index) => ({
+      ...activity,
+      color: colors[index % colors.length],
+      startAngle: timeToAngle(activity.startMinutes),
+      endAngle: timeToAngle(activity.endMinutes % (24 * 60)),
+    }));
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -152,11 +110,15 @@ const ActivityTracker = () => {
         }
 
         const processed = processActivities(parsedData);
-        setActivities(processed);
+        const chartActivities = toChartActivities(processed);
+        setActivities(chartActivities);
 
+        const skipped = parsedData.length - processed.length;
         toast({
           title: "File uploaded successfully!",
-          description: `Processed ${processed.length} activities`,
+          description: skipped > 0
+            ? `Processed ${processed.length} activities (skipped ${skipped} invalid)`
+            : `Processed ${processed.length} activities`,
         });
       } catch (error) {
         console.error('File parsing error:', error);
