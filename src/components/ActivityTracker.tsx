@@ -51,9 +51,22 @@ const ActivityTracker = () => {
     if (!chartRef.current) return;
 
     try {
+      // Capture the chart's full height plus a small bottom pad: html2canvas
+      // draws text slightly below the line box, which both clips the legend's
+      // `truncate` (overflow: hidden) labels and nicks the last row at the
+      // canvas edge. The clone gets matching padding so nothing is cropped.
+      const captureHeight = chartRef.current.scrollHeight + 24;
       const canvas = await html2canvas(chartRef.current, {
         backgroundColor: '#ffffff',
         scale: 2,
+        height: captureHeight,
+        windowHeight: captureHeight,
+        onclone: (_doc, element) => {
+          element.style.paddingBottom = '24px';
+          element.querySelectorAll('.truncate').forEach((node) => {
+            (node as HTMLElement).style.overflow = 'visible';
+          });
+        },
       });
 
       const link = document.createElement('a');

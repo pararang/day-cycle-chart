@@ -29,9 +29,11 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ activities, fullWidth, ch
           y={label.y}
           textAnchor="middle"
           dominantBaseline="middle"
-          fontSize={isLong ? '0.3rem' : '0.4rem'}
-          className="fill-black"
-          style={{ textShadow: '0.5px 0.5px 0.5px rgb(255, 255, 255)' }}
+          fontSize={isLong ? 4.8 : 6.4}
+          fill="#000000"
+          stroke="#ffffff"
+          strokeWidth={0.6}
+          paintOrder="stroke"
           transform={`rotate(${label.rotation}, ${label.x}, ${label.y})`}
         >
           {displayName}
@@ -69,8 +71,9 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ activities, fullWidth, ch
             y={y}
             textAnchor="middle"
             dominantBaseline="central"
-            fontSize="0.7rem"
-            className="font-bold fill-slate-700"
+            fontSize={11.2}
+            fontWeight={700}
+            fill="#334155"
           >
             {i}
           </text>
