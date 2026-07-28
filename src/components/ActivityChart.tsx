@@ -1,73 +1,19 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-
-interface ProcessedActivity {
-  name: string;
-  startMinutes: number;
-  endMinutes: number;
-  duration: number;
-  color: string;
-  zone: 'inner' | 'outer';
-  startAngle: number;
-  endAngle: number;
-}
+import { ChartActivity } from '@/lib/chart-activity';
+import { activityArc, CENTER } from '@/lib/chart-geometry';
 
 interface ActivityChartProps {
-  activities: ProcessedActivity[];
+  activities: ChartActivity[];
   fullWidth: boolean;
   chartRef: React.RefObject<HTMLDivElement>;
 }
 
 const ActivityChart: React.FC<ActivityChartProps> = ({ activities, fullWidth, chartRef }) => {
-  const createPieSlice = (activity: ProcessedActivity, index: number) => {
-    const centerX = 250;
-    const centerY = 250;
-    const outerRadius = activity.zone === 'inner' ? 120 : 200;
-    const innerRadius = activity.zone === 'inner' ? 0 : 130;
-
-    const startAngleRad = (activity.startAngle * Math.PI) / 180;
-    let endAngleRad = (activity.endAngle * Math.PI) / 180;
-
-    // Handle angle wrapping for overnight activities
-    let angleWidth = activity.endAngle - activity.startAngle;
-    if (angleWidth <= 0) {
-      angleWidth += 360;
-      endAngleRad = ((activity.endAngle + 360) * Math.PI) / 180;
-    }
-
-    const x1 = centerX + outerRadius * Math.cos(startAngleRad);
-    const y1 = centerY + outerRadius * Math.sin(startAngleRad);
-    const x2 = centerX + outerRadius * Math.cos(endAngleRad);
-    const y2 = centerY + outerRadius * Math.sin(endAngleRad);
-    const x3 = centerX + innerRadius * Math.cos(endAngleRad);
-    const y3 = centerY + innerRadius * Math.sin(endAngleRad);
-    const x4 = centerX + innerRadius * Math.cos(startAngleRad);
-    const y4 = centerY + innerRadius * Math.sin(startAngleRad);
-
-    const largeArcFlag = angleWidth > 180 ? 1 : 0;
-
-    const pathData = [
-      `M ${x1} ${y1}`,
-      `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
-      `L ${x3} ${y3}`,
-      `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${x4} ${y4}`,
-      'Z'
-    ].join(' ');
-
-    // Calculate text position (middle of the arc)
-    const midAngle = activity.startAngle + angleWidth / 2;
-    const midAngleRad = (midAngle * Math.PI) / 180;
-    let textRadius;
-    if (activity.zone === 'outer') {
-      textRadius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    } else {
-      textRadius = (outerRadius + innerRadius) / 2;
-    }
-    const textX = centerX + textRadius * Math.cos(midAngleRad);
-    const textY = centerY + textRadius * Math.sin(midAngleRad);
-
-    const isLeftHalf = midAngle > 90 && midAngle < 270;
-    const rotation = isLeftHalf ? midAngle + 180 : midAngle;
+  const createPieSlice = (activity: ChartActivity, index: number) => {
+    const { pathData, label } = activityArc(activity);
+    const isLong = activity.name.length > 30;
+    const displayName = isLong ? activity.name.substring(0, 30) + '...' : activity.name;
 
     return (
       <g key={`${activity.name}-${index}`}>
@@ -79,16 +25,18 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ activities, fullWidth, ch
           className="hover:opacity-80 transition-opacity cursor-pointer"
         />
         <text
-          x={textX}
-          y={textY}
+          x={label.x}
+          y={label.y}
           textAnchor="middle"
           dominantBaseline="middle"
-          fontSize={activity.name.length > 30 ? '0.3rem' : '0.4rem'}
-          className="fill-black"
-          style={{ textShadow: '0.5px 0.5px 0.5px rgb(255, 255, 255)' }}
-          transform={`rotate(${rotation}, ${textX}, ${textY})`}
+          fontSize={isLong ? 4.8 : 6.4}
+          fill="#000000"
+          stroke="#ffffff"
+          strokeWidth={0.6}
+          paintOrder="stroke"
+          transform={`rotate(${label.rotation}, ${label.x}, ${label.y})`}
         >
-          {activity.name.length > 30 ? activity.name.substring(0, 30) + '...' : activity.name}
+          {displayName}
         </text>
       </g>
     );
@@ -96,8 +44,8 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ activities, fullWidth, ch
 
   const createClockNumbers = () => {
     const numbers = [];
-    const centerX = 250;
-    const centerY = 250;
+    const centerX = CENTER;
+    const centerY = CENTER;
     const radius = 220;
     const lineLength = 210;
 
@@ -123,8 +71,9 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ activities, fullWidth, ch
             y={y}
             textAnchor="middle"
             dominantBaseline="central"
-            fontSize="0.7rem"
-            className="font-bold fill-slate-700"
+            fontSize={11.2}
+            fontWeight={700}
+            fill="#334155"
           >
             {i}
           </text>

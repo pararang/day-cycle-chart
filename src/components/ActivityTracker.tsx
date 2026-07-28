@@ -1,177 +1,49 @@
 import React, { useState, useRef } from 'react';
 import { Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import * as XLSX from 'xlsx';
-import html2canvas from 'html2canvas';
 import FileUpload from './FileUpload';
 import ChartControls from './ChartControls';
 import ActivityChart from './ActivityChart';
 import EmptyState from './EmptyState';
+import SeoContent from './SeoContent';
 import Footer from './Footer';
-
-interface Activity {
-  activity: string;
-  start: string;
-  end: string;
-}
-
-interface ProcessedActivity {
-  name: string;
-  startMinutes: number;
-  endMinutes: number;
-  duration: number;
-  color: string;
-  zone: 'inner' | 'outer';
-  startAngle: number;
-  endAngle: number;
-}
-
-const colors = [
-  '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-  '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
-  '#F8C471', '#82E0AA', '#F1948A', '#F5B041', '#D7BDE2',
-  '#FFD6E0', '#B5EAD7', '#C7CEEA', '#FFDAC1', '#E2F0CB',
-  '#B5B9FF', '#FFB7B2', '#F3FFE3', '#F9F871', '#A0CED9'
-];
+import { processActivities } from '@/lib/schedule';
+import { parseActivityFile } from '@/lib/parse';
+import { ChartActivity, toChartActivities } from '@/lib/chart-activity';
 
 const ActivityTracker = () => {
-  const [activities, setActivities] = useState<ProcessedActivity[]>([]);
+  const [activities, setActivities] = useState<ChartActivity[]>([]);
   const [fileName, setFileName] = useState<string>('');
   const [fullWidth, setFullWidth] = useState(false);
   const chartRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  const timeToMinutes = (timeStr: string): number => {
-    const [hours, minutes] = timeStr.split(/[:.]/);
-    return parseInt(hours) * 60 + (parseInt(minutes) || 0);
-  };
-
-  // Convert time to angle on a 12-hour clock (following vanilla JS logic)
-  const timeToAngle = (timeMinutes: number): number => {
-    // Convert to hours and minutes
-    const hours = Math.floor(timeMinutes / 60);
-    const minutes = timeMinutes % 60;
-
-    // Convert to 12-hour clock format (0-12 hours)
-    const h = hours % 12;
-    const angle = h * 30 + (minutes / 60) * 30;
-
-    // Rotate so 12 is at the top (subtract 90 degrees)
-    return (angle - 90 + 360) % 360;
-  };
-
-  // Determine if time is in inner or outer zone
-  const getZone = (timeMinutes: number): 'inner' | 'outer' => {
-    const hour = Math.floor(timeMinutes / 60);
-    return (hour >= 6 && hour < 18) ? 'inner' : 'outer';
-  };
-
-  const processActivities = (rawActivities: Activity[]): ProcessedActivity[] => {
-    return rawActivities.map((activity, index) => {
-      const startMinutes = timeToMinutes(activity.start);
-      let endMinutes = timeToMinutes(activity.end);
-
-      // Handle overnight activities
-      if (endMinutes <= startMinutes) {
-        endMinutes += 24 * 60; // Add 24 hours
-      }
-
-      const duration = endMinutes - startMinutes;
-      const zone = getZone(startMinutes);
-
-      // Calculate angles using the corrected logic
-      const startAngle = timeToAngle(startMinutes);
-      const endAngle = timeToAngle(endMinutes % (24 * 60));
-
-      return {
-        name: activity.activity,
-        startMinutes,
-        endMinutes,
-        duration,
-        color: colors[index % colors.length],
-        zone,
-        startAngle,
-        endAngle
-      };
-    });
-  };
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setFileName(file.name);
-    const reader = new FileReader();
 
-    reader.onload = (e) => {
-      try {
-        const data = e.target?.result;
-        let parsedData: Activity[] = [];
+    try {
+      const raw = await parseActivityFile(file);
+      const processed = processActivities(raw);
+      const chartActivities = toChartActivities(processed);
+      setActivities(chartActivities);
 
-        if (file.name.endsWith('.csv')) {
-          // Parse CSV
-          const text = data as string;
-          const lines = text.split('\n').filter(line => line.trim());
-          const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
-
-          console.log('CSV Headers:', headers);
-
-          // Find the indices for start, end, and activity/label columns
-          const startIndex = headers.findIndex(h => h === 'start');
-          const endIndex = headers.findIndex(h => h === 'end');
-          const activityIndex = headers.findIndex(h => h === 'activity' || h === 'label');
-
-          console.log('Column indices:', { startIndex, endIndex, activityIndex });
-
-          if (startIndex === -1 || endIndex === -1 || activityIndex === -1) {
-            throw new Error('Required columns not found. Expected: start, end, activity/label');
-          }
-
-          parsedData = lines.slice(1).map(line => {
-            const values = line.split(',').map(v => v.trim());
-            return {
-              start: values[startIndex],
-              end: values[endIndex],
-              activity: values[activityIndex]
-            };
-          }).filter(item => item.start && item.end && item.activity);
-
-          console.log('Parsed CSV data:', parsedData);
-        } else {
-          // Parse Excel
-          const workbook = XLSX.read(data, { type: 'binary' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
-
-          parsedData = jsonData.map(row => ({
-            start: row.start || row.Start,
-            end: row.end || row.End,
-            activity: row.activity || row.Activity || row.label || row.Label
-          }));
-        }
-
-        const processed = processActivities(parsedData);
-        setActivities(processed);
-
-        toast({
-          title: "File uploaded successfully!",
-          description: `Processed ${processed.length} activities`,
-        });
-      } catch (error) {
-        console.error('File parsing error:', error);
-        toast({
-          title: "Error parsing file",
-          description: "Please check your file format",
-          variant: "destructive",
-        });
-      }
-    };
-
-    if (file.name.endsWith('.csv')) {
-      reader.readAsText(file);
-    } else {
-      reader.readAsBinaryString(file);
+      const skipped = raw.length - processed.length;
+      toast({
+        title: "File uploaded successfully!",
+        description: skipped > 0
+          ? `Processed ${processed.length} activities (skipped ${skipped} invalid)`
+          : `Processed ${processed.length} activities`,
+      });
+    } catch (error) {
+      console.error('File parsing error:', error);
+      toast({
+        title: "Error parsing file",
+        description: "Please check your file format",
+        variant: "destructive",
+      });
     }
   };
 
@@ -179,9 +51,25 @@ const ActivityTracker = () => {
     if (!chartRef.current) return;
 
     try {
+      // Loaded on demand: html2canvas is large and only needed when a user
+      // actually exports, so keep it out of the initial bundle.
+      const { default: html2canvas } = await import('html2canvas');
+      // Capture the chart's full height plus a small bottom pad: html2canvas
+      // draws text slightly below the line box, which both clips the legend's
+      // `truncate` (overflow: hidden) labels and nicks the last row at the
+      // canvas edge. The clone gets matching padding so nothing is cropped.
+      const captureHeight = chartRef.current.scrollHeight + 24;
       const canvas = await html2canvas(chartRef.current, {
         backgroundColor: '#ffffff',
         scale: 2,
+        height: captureHeight,
+        windowHeight: captureHeight,
+        onclone: (_doc, element) => {
+          element.style.paddingBottom = '24px';
+          element.querySelectorAll('.truncate').forEach((node) => {
+            (node as HTMLElement).style.overflow = 'visible';
+          });
+        },
       });
 
       const link = document.createElement('a');
@@ -245,6 +133,8 @@ const ActivityTracker = () => {
         ) : (
           <EmptyState />
         )}
+
+        <SeoContent />
 
         <Footer />
       </div>

@@ -16,12 +16,12 @@ const Footer = () => {
           <div className="flex items-center gap-6 text-sm">
             <span>Made by</span>
             <a
-              href="https://pararang.com"
+              href="https://pararang.com/?utm_source=clockchart.pararang.com&utm_medium=referral&utm_campaign=clockchart"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener"
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
-              <span>pararang</span>
+              <span>pararang.com</span>
             </a>
             <a
               href="https://github.com/pararang/day-cycle-chart"
