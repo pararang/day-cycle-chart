@@ -31,7 +31,7 @@ const NotFound = () => {
           <Clock size={40} className="text-primary mx-auto mb-4" aria-hidden="true" />
           <h1 className="text-4xl font-bold mb-2">404</h1>
           <p className="text-muted-foreground mb-6">
-            Oops! Page not found — the page you're looking for doesn't exist.
+            That hour isn't on the clock — this page doesn't exist.
           </p>
           <Button variant="secondary" size="lg" onClick={() => navigate('/')}>
             Return to Home

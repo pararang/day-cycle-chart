@@ -31,7 +31,11 @@ const createPieSlice = (activity: ChartActivity, index: number) => {
   const timeRange = `${formatTime(activity.startMinutes)}–${formatTime(activity.endMinutes)}`;
 
   return (
-    <g key={`${activity.name}-${index}`}>
+    <g
+      key={`${activity.name}-${index}`}
+      className="animate-ring-in"
+      style={{ animationDelay: `${index * 0.05}s` }}
+    >
       <path
         d={pathData}
         fill={activity.color}
@@ -148,8 +152,8 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ activities, fullWidth, ch
 
   return (
     <LayerCard className="p-6">
-        <div ref={chartRef} className="flex flex-col items-center bg-background">
-          <div className={`relative ${fullWidth ? 'max-w-[90vw]' : 'max-w-[60vw]'} w-full`}>
+        <div ref={chartRef} className="flex flex-col items-center bg-background gap-8">
+          <div className={`relative ${fullWidth ? 'max-w-2xl' : 'max-w-md'} w-full`}>
             {timeOfDayWheel}
             <svg
               role="img"
@@ -165,16 +169,16 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ activities, fullWidth, ch
             </svg>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full">
             {activities.map((activity, index) => (
-              <div key={`${activity.name}-${index}`} className="flex items-center space-x-3 p-2 rounded-lg bg-muted/50">
+              <div key={`${activity.name}-${index}`} className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50 transition-transform duration-100 ease-out hover:scale-105">
                 <div
                   className="w-4 h-4 rounded-sm flex-shrink-0"
                   style={{ backgroundColor: activity.color }}
                 />
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium truncate">{activity.name}&nbsp;
-                    <span className="text-xs text-muted-foreground">
+                  <div className="text-label font-medium truncate">{activity.name}&nbsp;
+                    <span className="text-meta text-muted-foreground">
                     {formatDuration(activity.duration)}
                     </span>
                   </div>

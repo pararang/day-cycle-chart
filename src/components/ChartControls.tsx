@@ -19,7 +19,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
     <LayerCard className="mb-6 p-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-4">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-label text-muted-foreground">
               <span className="text-blue-600 font-medium">Inner ring:</span> 6AM-6PM <Sun size={14} className='inline' aria-hidden="true" />
               <span className="mx-2">•</span>
               <span className="text-purple-600 font-medium">Outer ring:</span> 6PM-6AM <Moon size={14} className='inline' aria-hidden="true" />

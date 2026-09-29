@@ -8,16 +8,28 @@ export interface ChartActivity extends ProcessedActivity {
   color: string;
 }
 
-// Distinct, repeating palette assigned to activities in order. This is a
+// Time-semantic palette assigned to activities in upload order. This is a
 // data-visualization content palette (chart slice colors), not a design
 // token - it is deliberately independent of the shadcn theme tokens in
 // src/index.css and stays fixed regardless of theme.
+//
+// The 25 hues are ordered as an ambient day gradient so the legend reads as
+// time progression even though assignment is by index, not by clock time:
+//   0-7   dawn / morning  - warm oranges, amber, soft gold
+//   8-12  midday          - bright warm yellows, light warm tones, cream
+//   13-15 dusk transition - desaturated neutral into soft lavender
+//   16-19 dusk            - cool blues
+//   20-24 night           - twilight purples into deep navy
+// Colors are interpolated in HSL for perceptual uniformity; adjacent entries
+// shift gradually so nothing clashes. The warm->cool bridge runs through a
+// desaturated neutral + lavender rather than green to stay on the warm-to-cool
+// axis. Activities cycle through this array once they exceed its length.
 const COLORS = [
-  '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-  '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
-  '#F8C471', '#82E0AA', '#F1948A', '#F5B041', '#D7BDE2',
-  '#FFD6E0', '#B5EAD7', '#C7CEEA', '#FFDAC1', '#E2F0CB',
-  '#B5B9FF', '#FFB7B2', '#F3FFE3', '#F9F871', '#A0CED9',
+  '#ec713c', '#ec7d41', '#ec8846', '#ec944b', '#ec9e51',
+  '#eaa955', '#e8b359', '#e7bc5d', '#e5c461', '#e4ca6c',
+  '#e4cf77', '#e3d382', '#e0d49f', '#dfd8b9', '#c9c5ba',
+  '#a3a6c2', '#8792c0', '#6782c1', '#5063bc', '#4045b2',
+  '#3e36a1', '#3b2e8f', '#37267d', '#321f6a', '#2c1958',
 ];
 
 // Assign each schedule fact a palette color, cycling once activities exceed the

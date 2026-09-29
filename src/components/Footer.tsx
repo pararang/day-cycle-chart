@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           {/* Center section - Links */}
-          <div className="flex items-center gap-6 text-sm">
+          <div className="flex items-center gap-6 text-label">
             <span>Made by</span>
             <a
               href="https://pararang.com/?utm_source=clockchart.pararang.com&utm_medium=referral&utm_campaign=clockchart"
@@ -28,7 +28,7 @@ const Footer = () => {
           </div>
 
           {/* Right section - Support */}
-          <div className="text-sm">
+          <div className="text-label">
             <a
               href="https://saweria.co/pararang"
               target="_blank"
@@ -47,10 +47,11 @@ const Footer = () => {
 
         {/* Bottom section - Acknowledgments */}
         <div className="mt-4 pt-4 border-t border-border/40">
-          <div className="text-center text-xs text-muted-foreground">
+          <div className="text-center text-meta text-muted-foreground">
             <p className="mb-2">
               <a target="_blank" rel="noopener noreferrer" href="https://icons8.com/icon/42788/clock">Favicon</a> by <a target="_blank" rel="noopener noreferrer" href="https://icons8.com">Icons8</a> <br /> Designed by Lovable, Assisted by Copilot and Amazon Q
             </p>
+            <p>May your hours be well-spent ⏰</p>
           </div>
         </div>
       </div>

@@ -15,8 +15,8 @@ const EmptyState: React.FC = () => {
           />
         </div>
       }
-      title="No Activities Yet"
-      description="Upload your activity data to see a beautiful 24-hour visualization of your daily routine."
+      title="Your day is waiting"
+      description="Upload a CSV or Excel schedule to see it drawn as a 24-hour clock."
     />
   );
 };
