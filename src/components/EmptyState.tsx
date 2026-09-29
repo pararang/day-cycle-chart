@@ -1,25 +1,23 @@
 import React from 'react';
-import { Clock, Upload } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Clock, Upload } from '@phosphor-icons/react';
+import { Empty } from '@cloudflare/kumo';
 
 const EmptyState: React.FC = () => {
   return (
-    <Card>
-      <CardContent className="p-12">
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="relative">
-              <Clock className="h-16 w-16 text-muted-foreground" aria-hidden="true" />
-              <Upload className="h-6 w-6 text-primary absolute -bottom-1 -right-1 bg-background rounded-full p-1" aria-hidden="true" />
-            </div>
-          </div>
-          <p className="text-lg font-semibold">No Activities Yet</p>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Upload your activity data to see a beautiful 24-hour visualization of your daily routine.
-          </p>
+    <Empty
+      icon={
+        <div className="relative inline-flex">
+          <Clock size={64} className="text-muted-foreground" aria-hidden="true" />
+          <Upload
+            size={28}
+            className="text-primary absolute -bottom-1 -right-1 bg-background rounded-full"
+            aria-hidden="true"
+          />
         </div>
-      </CardContent>
-    </Card>
+      }
+      title="No Activities Yet"
+      description="Upload your activity data to see a beautiful 24-hour visualization of your daily routine."
+    />
   );
 };
 

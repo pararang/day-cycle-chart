@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Clock } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Clock } from '@phosphor-icons/react';
+import { useKumoToastManager } from '@cloudflare/kumo';
 import FileUpload from './FileUpload';
 import ChartControls from './ChartControls';
 import ActivityChart from './ActivityChart';
@@ -15,14 +15,17 @@ const ActivityTracker = () => {
   const [activities, setActivities] = useState<ChartActivity[]>([]);
   const [fileName, setFileName] = useState<string>('');
   const [fullWidth, setFullWidth] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const chartRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
+  const { add: toast } = useKumoToastManager();
 
   const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setFileName(file.name);
+    setUploading(true);
 
     try {
       const raw = await parseActivityFile(file);
@@ -32,6 +35,7 @@ const ActivityTracker = () => {
 
       const skipped = raw.length - processed.length;
       toast({
+        variant: "success",
         title: "File uploaded successfully!",
         description: skipped > 0
           ? `Processed ${processed.length} activities (skipped ${skipped} invalid)`
@@ -40,53 +44,60 @@ const ActivityTracker = () => {
     } catch (error) {
       console.error('File parsing error:', error);
       toast({
+        variant: "error",
         title: "Error parsing file",
         description: "Please check your file format",
-        variant: "destructive",
       });
+    } finally {
+      setUploading(false);
     }
   }, [toast]);
 
   const downloadChart = useCallback(async () => {
-    if (!chartRef.current) return;
+    const node = chartRef.current;
+    if (!node) return;
 
+    setDownloading(true);
     try {
-      // Loaded on demand: html2canvas is large and only needed when a user
-      // actually exports, so keep it out of the initial bundle.
-      const { default: html2canvas } = await import('html2canvas');
-      // Capture the chart's full height plus a small bottom pad: html2canvas
-      // draws text slightly below the line box, which both clips the legend's
-      // `truncate` (overflow: hidden) labels and nicks the last row at the
-      // canvas edge. The clone gets matching padding so nothing is cropped.
-      const captureHeight = chartRef.current.scrollHeight + 24;
-      const canvas = await html2canvas(chartRef.current, {
-        backgroundColor: '#ffffff',
-        scale: 2,
-        height: captureHeight,
-        windowHeight: captureHeight,
-        onclone: (_doc, element) => {
-          element.style.paddingBottom = '24px';
-          element.querySelectorAll('.truncate').forEach((node) => {
-            (node as HTMLElement).style.overflow = 'visible';
-          });
-        },
-      });
+      // Loaded on demand: html-to-image is only needed when a user exports,
+      // so keep it out of the initial bundle. It renders via the browser's
+      // own engine (foreignObject SVG), so it handles Tailwind v4's oklch()
+      // colors that html2canvas cannot parse.
+      const { toPng } = await import('html-to-image');
+
+      // Pad the captured node below the last row and expose truncated legend
+      // labels during capture, restoring both afterward.
+      const prevPad = node.style.paddingBottom;
+      node.style.paddingBottom = '24px';
+      const truncates = Array.from(node.querySelectorAll('.truncate')) as HTMLElement[];
+      truncates.forEach((el) => { el.style.overflow = 'visible'; });
+
+      let dataUrl: string;
+      try {
+        dataUrl = await toPng(node, { pixelRatio: 2, backgroundColor: '#ffffff', cacheBust: true });
+      } finally {
+        node.style.paddingBottom = prevPad;
+        truncates.forEach((el) => { el.style.overflow = ''; });
+      }
 
       const link = document.createElement('a');
       link.download = 'activity-chart.png';
-      link.href = canvas.toDataURL();
+      link.href = dataUrl;
       link.click();
 
       toast({
+        variant: "success",
         title: "Chart downloaded!",
         description: "Your activity chart has been saved",
       });
     } catch (error) {
       toast({
+        variant: "error",
         title: "Download failed",
         description: "There was an error downloading the chart",
-        variant: "destructive",
       });
+    } finally {
+      setDownloading(false);
     }
   }, [toast]);
 
@@ -106,7 +117,7 @@ const ActivityTracker = () => {
         <div className="py-8"></div>
         <div className="text-center px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold flex items-center justify-center gap-3 mb-2">
-            <Clock className="h-8 w-8 text-primary" aria-hidden="true" />
+            <Clock size={32} className="text-primary" aria-hidden="true" />
             Daily Activity Visualization in 24-Hour Clock Chart
           </h1>
           <p className="text-muted-foreground">
@@ -114,13 +125,14 @@ const ActivityTracker = () => {
           </p>
         </div>
 
-        <FileUpload onFileUpload={handleFileUpload} fileName={fileName} activitiesCount={activities.length} />
+        <FileUpload onFileUpload={handleFileUpload} fileName={fileName} activitiesCount={activities.length} uploading={uploading} />
 
         {activities.length > 0 && (
           <ChartControls
             fullWidth={fullWidth}
             onFullWidthToggle={setFullWidth}
             onDownload={downloadChart}
+            downloading={downloading}
           />
         )}
 

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { LayerCard } from '@cloudflare/kumo';
 import { ChartActivity } from '@/lib/chart-activity';
 import { activityArc, CENTER } from '@/lib/chart-geometry';
 
@@ -9,10 +9,26 @@ interface ActivityChartProps {
   chartRef: React.RefObject<HTMLDivElement>;
 }
 
+// "450 minutes" -> "7h 30m" (never rounds a 30-minute activity up to "1h").
+const formatDuration = (minutes: number) => {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return `${m}m`;
+  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+};
+
+// Minutes-since-midnight -> "HH:MM", wrapping past midnight (e.g. 1500 -> 01:00).
+const formatTime = (minutes: number) => {
+  const m = ((minutes % 1440) + 1440) % 1440;
+  return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+};
+
 const createPieSlice = (activity: ChartActivity, index: number) => {
   const { pathData, label } = activityArc(activity);
   const isLong = activity.name.length > 30;
   const displayName = isLong ? activity.name.substring(0, 30) + '...' : activity.name;
+
+  const timeRange = `${formatTime(activity.startMinutes)}–${formatTime(activity.endMinutes)}`;
 
   return (
     <g key={`${activity.name}-${index}`}>
@@ -22,7 +38,9 @@ const createPieSlice = (activity: ChartActivity, index: number) => {
         stroke="white"
         strokeWidth="0.5"
         className="hover:opacity-80 transition-opacity"
-      />
+      >
+        <title>{activity.name} · {timeRange} · {formatDuration(activity.duration)}</title>
+      </path>
       <text
         x={label.x}
         y={label.y}
@@ -78,6 +96,12 @@ const CLOCK_NUMBERS = (() => {
         >
           {i}
         </text>
+        {i === 12 && (
+          <>
+            <text x={CENTER - 52} y={CENTER - 216} textAnchor="middle" fontSize={9} fontWeight={700} fill="#334155">AM</text>
+            <text x={CENTER + 52} y={CENTER - 216} textAnchor="middle" fontSize={9} fontWeight={700} fill="#334155">PM</text>
+          </>
+        )}
       </g>
     );
   }
@@ -98,8 +122,7 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ activities, fullWidth, ch
   }, [activities]);
 
   return (
-    <Card>
-      <CardContent className="p-6">
+    <LayerCard className="p-6">
         <div ref={chartRef} className="flex flex-col items-center bg-background">
           <svg
             role="img"
@@ -124,7 +147,7 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ activities, fullWidth, ch
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-medium truncate">{activity.name}&nbsp;
                     <span className="text-xs text-muted-foreground">
-                    {Math.round(activity.duration / 60)}h
+                    {formatDuration(activity.duration)}
                     </span>
                   </div>
                 </div>
@@ -132,8 +155,7 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ activities, fullWidth, ch
             ))}
           </div>
         </div>
-      </CardContent>
-    </Card>
+    </LayerCard>
   );
 };
 

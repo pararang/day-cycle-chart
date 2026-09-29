@@ -1,28 +1,28 @@
 import React from 'react';
-import { Download, Maximize2, Minimize2, Moon, Sun } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { ArrowsIn, ArrowsOut, Download, Moon, Sun } from '@phosphor-icons/react';
+import { Button, LayerCard } from '@cloudflare/kumo';
 
 interface ChartControlsProps {
   fullWidth: boolean;
   onFullWidthToggle: (fullWidth: boolean) => void;
   onDownload: () => void;
+  downloading: boolean;
 }
 
 const ChartControls: React.FC<ChartControlsProps> = ({
   fullWidth,
   onFullWidthToggle,
-  onDownload
+  onDownload,
+  downloading
 }) => {
   return (
-    <Card className="mb-6">
-      <CardContent className="p-4">
+    <LayerCard className="mb-6 p-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-4">
             <div className="text-sm text-muted-foreground">
-              <span className="text-blue-600 font-medium">Inner ring:</span> 6AM-6PM <Sun size={14} color='black' className='inline' aria-hidden="true" />
+              <span className="text-blue-600 font-medium">Inner ring:</span> 6AM-6PM <Sun size={14} className='inline' aria-hidden="true" />
               <span className="mx-2">•</span>
-              <span className="text-purple-600 font-medium">Outer ring:</span> 6PM-6AM <Moon size={14} color='black' className='inline' aria-hidden="true" />
+              <span className="text-purple-600 font-medium">Outer ring:</span> 6PM-6AM <Moon size={14} className='inline' aria-hidden="true" />
             </div>
           </div>
           
@@ -30,25 +30,25 @@ const ChartControls: React.FC<ChartControlsProps> = ({
             <Button
               variant="outline"
               size="sm"
+              icon={fullWidth ? <ArrowsIn size={16} /> : <ArrowsOut size={16} />}
               onClick={() => onFullWidthToggle(!fullWidth)}
-              className="flex items-center space-x-2"
             >
-              {fullWidth ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-              <span>{fullWidth ? 'Compact' : 'Full Width'}</span>
+              {fullWidth ? 'Compact' : 'Full Width'}
             </Button>
             
             <Button
-              onClick={onDownload}
+              variant="secondary"
               size="sm"
-              className="flex items-center space-x-2"
+              icon={<Download size={16} />}
+              onClick={onDownload}
+              loading={downloading}
+              aria-busy={downloading}
             >
-              <Download size={16} />
-              <span>Download</span>
+              Download
             </Button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+    </LayerCard>
   );
 };
 

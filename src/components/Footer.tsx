@@ -1,17 +1,10 @@
-import { ExternalLink, Github, Heart } from "lucide-react";
+import { GithubLogo } from "@phosphor-icons/react";
 
 const Footer = () => {
   return (
     <footer className="mt-auto border-t bg-background">
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          {/* Left section - Project info */}
-          <div className="flex flex-col md:flex-row items-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-
-            </div>
-          </div>
-
           {/* Center section - Links */}
           <div className="flex items-center gap-6 text-sm">
             <span>Made by</span>
@@ -29,7 +22,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               className="flex items-center gap-2 py-2 text-muted-foreground hover:text-foreground transition-colors"
             >
-              <Github className="h-4 w-4" />
+              <GithubLogo size={16} />
               <span>Source Code</span>
             </a>
           </div>
