@@ -121,21 +121,49 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ activities, fullWidth, ch
     return { innerSlices: inner, outerSlices: outer };
   }, [activities]);
 
+  // Ambient day/night wheel behind the clock face. Barely-there on purpose:
+  // it tints the time-of-day (cold dawn/orange dusk at the 6 tick, warm noon
+  // at the 12) without fighting the activity slice palette. The 12 face ticks
+  // are kept so the hour dial stays legible.
+  const timeOfDayWheel = (
+    <div
+      aria-hidden="true"
+      className="absolute inset-0 rounded-full"
+      style={{
+        background: `conic-gradient(
+          from 0deg at 50% 50%,
+          #ffe3b3 0deg,
+          #fff4d6 60deg,
+          #eff6ff 150deg,
+          #cfe0ff 210deg,
+          #b8aee0 260deg,
+          #ffe3b3 330deg,
+          #ffe3b3 360deg
+        )`,
+        filter: 'blur(4px)',
+        opacity: 0.35,
+      }}
+    />
+  );
+
   return (
     <LayerCard className="p-6">
         <div ref={chartRef} className="flex flex-col items-center bg-background">
-          <svg
-            role="img"
-            aria-label={`24-hour activity clock chart showing ${activities.length} activities`}
-            width="100%"
-            height="100%"
-            viewBox="0 0 500 500"
-            className={`block h-auto mb-6 ${fullWidth ? 'max-w-[90vw]' : 'max-w-[60vw]'}`}
-          >
-            {CLOCK_NUMBERS}
-            {innerSlices}
-            {outerSlices}
-          </svg>
+          <div className={`relative ${fullWidth ? 'max-w-[90vw]' : 'max-w-[60vw]'} w-full`}>
+            {timeOfDayWheel}
+            <svg
+              role="img"
+              aria-label={`24-hour activity clock chart showing ${activities.length} activities`}
+              width="100%"
+              height="100%"
+              viewBox="0 0 500 500"
+              className="block h-auto relative"
+            >
+              {CLOCK_NUMBERS}
+              {innerSlices}
+              {outerSlices}
+            </svg>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 w-full">
             {activities.map((activity, index) => (
