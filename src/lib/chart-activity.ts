@@ -8,7 +8,10 @@ export interface ChartActivity extends ProcessedActivity {
   color: string;
 }
 
-// Distinct, repeating palette assigned to activities in order.
+// Distinct, repeating palette assigned to activities in order. This is a
+// data-visualization content palette (chart slice colors), not a design
+// token - it is deliberately independent of the shadcn theme tokens in
+// src/index.css and stays fixed regardless of theme.
 const COLORS = [
   '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
   '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',

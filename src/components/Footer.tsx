@@ -2,7 +2,7 @@ import { ExternalLink, Github, Heart } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="mt-auto border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <footer className="mt-auto border-t bg-background">
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           {/* Left section - Project info */}
@@ -19,7 +19,7 @@ const Footer = () => {
               href="https://pararang.com/?utm_source=clockchart.pararang.com&utm_medium=referral&utm_campaign=clockchart"
               target="_blank"
               rel="noopener"
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-2 py-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <span>pararang.com</span>
             </a>
@@ -27,16 +27,28 @@ const Footer = () => {
               href="https://github.com/pararang/day-cycle-chart"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-2 py-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <Github className="h-4 w-4" />
               <span>Source Code</span>
             </a>
           </div>
 
-          {/* Right section - Copyright */}
-          <div className="text-sm text-muted-foreground">
-
+          {/* Right section - Support */}
+          <div className="text-sm">
+            <a
+              href="https://saweria.co/pararang"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 py-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <img
+                src="https://api.qrserver.com/v1/create-qr-code/?size=640x640&data=https://saweria.co/pararang"
+                alt="QR code to donate via Saweria (saweria.co/pararang)"
+                className="w-10 h-10 rounded border border-border"
+              />
+              <span>Buy me a coffee</span>
+            </a>
           </div>
         </div>
 

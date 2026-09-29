@@ -9,11 +9,11 @@ const EmptyState: React.FC = () => {
         <div className="text-center space-y-4">
           <div className="flex justify-center">
             <div className="relative">
-              <Clock className="h-16 w-16 text-muted-foreground" />
-              <Upload className="h-6 w-6 text-primary absolute -bottom-1 -right-1 bg-background rounded-full p-1" />
+              <Clock className="h-16 w-16 text-muted-foreground" aria-hidden="true" />
+              <Upload className="h-6 w-6 text-primary absolute -bottom-1 -right-1 bg-background rounded-full p-1" aria-hidden="true" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold">No Activities Yet</h3>
+          <p className="text-lg font-semibold">No Activities Yet</p>
           <p className="text-muted-foreground max-w-md mx-auto">
             Upload your activity data to see a beautiful 24-hour visualization of your daily routine.
           </p>

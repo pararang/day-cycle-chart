@@ -23,6 +23,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, fileName, activit
                 type="file"
                 accept=".csv,.xlsx,.xls"
                 onChange={onFileUpload}
+                aria-label="Upload your activity CSV or Excel file (columns: activity, start, end)"
                 className="w-full p-2 text-sm border border-input rounded bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer file:mr-2 file:px-2 file:py-1 file:rounded file:border-0 file:bg-primary file:text-primary-foreground file:text-xs"
               />
               {fileName && (
@@ -40,6 +41,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, fileName, activit
                   download
                   className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 underline"
                   target='_blank'
+                  rel="noopener noreferrer"
                 >
                   take a look
                 </a>

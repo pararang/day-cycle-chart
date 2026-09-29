@@ -19,14 +19,10 @@ const ChartControls: React.FC<ChartControlsProps> = ({
       <CardContent className="p-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-4">
-            {/* <div className="text-sm text-muted-foreground">
-              <span className="font-medium">11</span> activities loaded
-            </div>
-            <div className="hidden sm:block h-4 w-px bg-border"></div> */}
             <div className="text-sm text-muted-foreground">
-              <span className="text-blue-600 font-medium">Inner ring:</span> 6AM-6PM <Sun size={14} color='black' className='inline' />
+              <span className="text-blue-600 font-medium">Inner ring:</span> 6AM-6PM <Sun size={14} color='black' className='inline' aria-hidden="true" />
               <span className="mx-2">•</span>
-              <span className="text-purple-600 font-medium">Outer ring:</span> 6PM-6AM <Moon size={14} color='black' className='inline' />
+              <span className="text-purple-600 font-medium">Outer ring:</span> 6PM-6AM <Moon size={14} color='black' className='inline' aria-hidden="true" />
             </div>
           </div>
           

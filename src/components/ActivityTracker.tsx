@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import FileUpload from './FileUpload';
@@ -18,7 +18,7 @@ const ActivityTracker = () => {
   const chartRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -45,9 +45,9 @@ const ActivityTracker = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
 
-  const downloadChart = async () => {
+  const downloadChart = useCallback(async () => {
     if (!chartRef.current) return;
 
     try {
@@ -88,7 +88,7 @@ const ActivityTracker = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
 
   return (
     <div className="min-h-screen w-full relative bg-white">
@@ -103,10 +103,10 @@ const ActivityTracker = () => {
         }}
       />
       <div className="max-w-4xl mx-auto space-y-6 relative z-10">
-        <div className="py-8 px-4 sm:px-6 lg:px-8"></div>
-        <div className="text-center">
+        <div className="py-8"></div>
+        <div className="text-center px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold flex items-center justify-center gap-3 mb-2">
-            <Clock className="h-8 w-8 text-primary" />
+            <Clock className="h-8 w-8 text-primary" aria-hidden="true" />
             Daily Activity Visualization in 24-Hour Clock Chart
           </h1>
           <p className="text-muted-foreground">
@@ -138,24 +138,6 @@ const ActivityTracker = () => {
 
         <Footer />
       </div>
-
-      {/* Floating Saweria QR Code - Bottom Right */}
-      {activities.length > 0 && (
-        <div className="fixed bottom-4 left-4 z-50 animate-pulse">
-          <div className="bg-white rounded-lg shadow-lg p-2 border border-gray-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <p className="text-xs text-center text-gray-600 font-bold">Buy me a coffee</p>
-            <div className="mt-2">
-              <img 
-                src="https://api.qrserver.com/v1/create-qr-code/?size=640x640&data=https://saweria.co/pararang"
-                alt="Donate via Saweria"
-                className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40"
-                title="Scan to donate via Saweria"
-              />
-            </div>
-            <p className="text-xs text-center text-gray-600 mt-1">https://saweria.co/pararang</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
